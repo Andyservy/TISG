@@ -3,18 +3,19 @@ import wx
 
 class Btnbicolor(object):
 
-    def __init__(self, Botones, Color_0, Color_1):
+    def __init__(self, botones, color_0, color_1):
+
         """
         Solo se considerara dos valores en Color, ya que esos interaran
         """
         try:
-            self.ON = Color_1
+            self.ON = color_1
         except IndexError:
             print('Se omitieron valores', Btnbicolor, ',se consideran solo dos valores')
             exit()
 
-        self.Coletionbutton(Botones, Color_0)
-        self.OFF = Color_0
+        self.Coletionbutton(botones, color_0)
+        self.OFF = color_0
 
     def Coletionbutton(self, Botones_stylecmn, Colour):
 

@@ -15,10 +15,12 @@ class frame_main(wx.Frame):
         self.Color = "#212F3C"
 
         self.Formulario = Verificacion(self)
+        self.User_name = self.Formulario.User
+
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(self.sizer)
 
         self.GUI_init()
-
-        self.User_name = self.Formulario.User
 
     def GUI_init(self):
         # Verificación
@@ -37,12 +39,13 @@ class frame_main(wx.Frame):
 
     # VERIFICACIÓN
 
-    def __OnClickOK(self):
-
-        Menu_Main(self)
+    def OnClickOK(self):
+        Pl_MenuMain = Menu_Main(self)
+        self.sizer.Add(Pl_MenuMain, 1, wx.EXPAND)
 
     def OnClickCancel(self, event):
         self.Close()
+
 
 """
 Al usar show () fuera de la definición de los atributos, se debe establecer una variable que herede la clase que 

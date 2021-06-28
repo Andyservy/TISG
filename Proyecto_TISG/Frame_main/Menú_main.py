@@ -23,7 +23,7 @@ class Menu_Main(wx.Panel):
         self.check()
         self.init_GUI()
 
-        self.Layout()
+        self.Show()
 
     def check(self):
         global User
@@ -105,10 +105,13 @@ class Menu_Main(wx.Panel):
         self.Verificacion.ShowModal()
 
     def OnClick_Facturacion(self, event):
-        Facturacion(self)
+        self.Hide()
+
+        Pl_Facturacion = Facturacion(self.Parent)
+        self.Parent.sizer.Add(Pl_Facturacion, wx.EXPAND)
 
     # VERIFICACIÓN_Configuración
-    def __OnClickOK(self):
+    def OnClickOK(self):
         # Dar acceso
         Confi_sesion = Restablecimiento_de_datos(self)
         Confi_sesion.ShowModal()
@@ -124,6 +127,8 @@ class Facturacion(Menu_Main):
         self.SetBackgroundColour("#212F3C")
 
         self.__init_GUI()
+
+        self.Layout()
 
     def __init_GUI(self):
         Box_Main = wx.BoxSizer(wx.VERTICAL)

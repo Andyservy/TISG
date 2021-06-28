@@ -166,7 +166,7 @@ class Panel(wx.Panel):
                     Login = self.cursor.fetchall()
                     self.Parent.User = Login[0][0]
 
-                    Summoner.__OnClickOK()  # Dentro del super padre, hay un método, esta función ejecuta
+                    Summoner.OnClickOK()  # Dentro del super padre, hay un método, esta función ejecuta
                     # lo que se debe hacer después
 
                     """

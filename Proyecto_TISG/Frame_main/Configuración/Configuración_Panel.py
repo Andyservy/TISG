@@ -52,8 +52,7 @@ class Panel_Confi(wx.Panel):
         Entrada_Usuario = wx.TextCtrl(box_Usuario.GetStaticBox(), -1, style=wx.BORDER_NONE)
         box_Usuario.Add(Entrada_Usuario, 1, wx.EXPAND | wx.ALL, 5)
 
-        pic_username = wx.Bitmap('E:/WINDOWS_NOW/Escritorio/Proyectos/Programación/TISG/Proyecto_TISG/data'
-                                 '/GUARDAR_ICON.png', wx.BITMAP_TYPE_PNG)
+        pic_username = wx.Bitmap('C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/GUARDAR_ICON.png', wx.BITMAP_TYPE_PNG)
         Guardar_username = wx.BitmapButton(box_Usuario.GetStaticBox(), -1, pic_username, size=(50, 50))
         box_Usuario.Add(Guardar_username)
 
@@ -66,10 +65,9 @@ class Panel_Confi(wx.Panel):
 
         Entrada_Contraseña = wx.TextCtrl(box_Contraseña.GetStaticBox(), -1, style=wx.BORDER_NONE | wx.TE_PASSWORD)
         box_Contraseña_1.Add(Entrada_Contraseña, 1, wx.EXPAND | wx.ALL, 5)
-        self.tip = wx.adv.RichToolTip("LIMIT", "La contraseña debe tener mas de 6 dígitos")
+        self.tip = wx.adv.RichToolTip('LIMIT', 'La contraseña debe tener mas de 6 dígitos')
 
-        pic_contraseña = wx.Bitmap('E:/WINDOWS_NOW/Escritorio/Proyectos/Programación/TISG/Proyecto_TISG/data'
-                                   '/GUARDAR_ICON.png', wx.BITMAP_TYPE_PNG)
+        pic_contraseña = wx.Bitmap('C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/GUARDAR_ICON.png', wx.BITMAP_TYPE_PNG)
         Guardar_contraseña = wx.BitmapButton(box_Contraseña.GetStaticBox(), -1, pic_contraseña, size=(50, 50))
         box_Contraseña_1.Add(Guardar_contraseña)
 
