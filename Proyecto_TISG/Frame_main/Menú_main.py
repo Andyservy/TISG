@@ -5,14 +5,14 @@ import wx.lib.agw.gradientbutton as gb
 # Package Project
 
 from Proyecto_TISG.Package.Formulary import Verificacion
-from Proyecto_TISG.Frame_main.Configuración import Restablecimiento_de_datos
+from Proyecto_TISG.Frame_main.Configuración import RestablecimientoDeDatos
 from Proyecto_TISG.Package import Btnbicolor, ShapedButton
 
 
-class Menu_Main(wx.Panel):
+class MenuMain(wx.Panel):
 
     def __init__(self, parent):
-        super(Menu_Main, self).__init__(parent, -1)
+        super(MenuMain, self).__init__(parent, -1)
 
         self.Color = self.Parent.Color
         self.SetBackgroundColour(self.Color)
@@ -47,17 +47,17 @@ class Menu_Main(wx.Panel):
         bmpBtn_Configuration = gb.GradientButton(self, wx.ID_ANY, label="Configuración")
         Data_sesión.Add(bmpBtn_Configuration, 1, wx.EXPAND | wx.ALL, 20)
 
-        Facturación = wx.Button(self, -1, 'FACTURACIÓN')
-        Inventario = wx.Button(self, -1, 'INVENTARIO')
-        Utilería = wx.Button(self, -1, 'UTILERÍA')
-        Estadísticas = wx.Button(self, -1, 'ESTADÍSTICAS')
-        Agenda = wx.Button(self, -1, 'AGENDA')
-        Nomina = wx.Button(self, -1, 'NOMINA')
+        btn_Facturacion = wx.Button(self, -1, 'FACTURACIÓN')
+        btn_Inventario = wx.Button(self, -1, 'INVENTARIO')
+        btn_Utileria = wx.Button(self, -1, 'UTILERÍA')
+        btn_Estadisticas = wx.Button(self, -1, 'ESTADÍSTICAS')
+        btn_Agenda = wx.Button(self, -1, 'AGENDA')
+        btn_Nomina = wx.Button(self, -1, 'NOMINA')
 
-        Items_List = [Facturación, Inventario, Utilería, Estadísticas, Agenda, Nomina]
+        Items_List = [btn_Facturacion, btn_Inventario, btn_Utileria, btn_Estadisticas, btn_Agenda, btn_Nomina]
 
-        Items_STYLES_1 = [Facturación, Inventario, Utilería]
-        Items_Styles_2 = [Estadísticas, Agenda, Nomina]
+        Items_STYLES_1 = [btn_Facturacion, btn_Inventario, btn_Utileria]
+        Items_Styles_2 = [btn_Estadisticas, btn_Agenda, btn_Nomina]
 
         for _ in Items_STYLES_1:
             Items_colum1.Add(_, 1, wx.EXPAND | wx.ALL, 10)
@@ -96,7 +96,7 @@ class Menu_Main(wx.Panel):
 
         # EVENTOS
         bmpBtn_Configuration.Bind(wx.EVT_BUTTON, self.OnClick_Configuracion)
-        Facturación.Bind(wx.EVT_BUTTON, self.OnClick_Facturacion)
+        btn_Facturacion.Bind(wx.EVT_BUTTON, self.OnClick_Facturacion)
 
     def OnClick_Configuracion(self, event):
 
@@ -113,14 +113,14 @@ class Menu_Main(wx.Panel):
     # VERIFICACIÓN_Configuración
     def OnClickOK(self):
         # Dar acceso
-        Confi_sesion = Restablecimiento_de_datos(self)
+        Confi_sesion = RestablecimientoDeDatos(self)
         Confi_sesion.ShowModal()
 
     def OnClickCancel(self, event):
         self.Verificacion.Close()
 
 
-class Facturacion(Menu_Main):
+class Facturacion(MenuMain):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 

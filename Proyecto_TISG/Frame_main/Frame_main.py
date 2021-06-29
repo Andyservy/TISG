@@ -2,14 +2,14 @@
 import wx
 
 # Package Project
-from Proyecto_TISG.Frame_main.Menú_main import Menu_Main
+from Proyecto_TISG.Frame_main.Menú_main import MenuMain
 from Proyecto_TISG.Package.Formulary import Verificacion
 from Proyecto_TISG import connection
 
 
-class frame_main(wx.Frame):
+class FrameMain(wx.Frame):
     def __init__(self, parent, title, size):
-        super(frame_main, self).__init__(parent, title=title, size=size)
+        super(FrameMain, self).__init__(parent, title=title, size=size)
 
         self.Centre()
         self.Color = "#212F3C"
@@ -40,7 +40,7 @@ class frame_main(wx.Frame):
     # VERIFICACIÓN
 
     def OnClickOK(self):
-        Pl_MenuMain = Menu_Main(self)
+        Pl_MenuMain = MenuMain(self)
         self.sizer.Add(Pl_MenuMain, 1, wx.EXPAND)
 
     def OnClickCancel(self, event):

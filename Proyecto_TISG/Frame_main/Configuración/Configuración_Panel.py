@@ -6,23 +6,23 @@ from Proyecto_TISG.data.SERVIRDOR.DATABASE import connection
 import wx.adv
 
 
-class Restablecimiento_de_datos(wx.Dialog):
+class RestablecimientoDeDatos(wx.Dialog):
     def __init__(self, parent):
-        super(Restablecimiento_de_datos, self).__init__(parent)
+        super(RestablecimientoDeDatos, self).__init__(parent)
 
         self.SetBackgroundColour("#212F3C")
         self.SetSize(700, 500)
         self.Centre()
 
-        Panel_Confi(self)
+        PanelConfi(self)
 
 
 # Después de cerrarme recién entra al segundo ok que esta dentro del formulario
 
-class Panel_Confi(wx.Panel):
+class PanelConfi(wx.Panel):
 
     def __init__(self, parent):
-        super(Panel_Confi, self).__init__(parent)
+        super(PanelConfi, self).__init__(parent)
 
         self.init_GUI()
 

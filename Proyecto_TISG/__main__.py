@@ -1,12 +1,12 @@
 import wx
 
-from Proyecto_TISG.Frame_main import frame_main
+from Proyecto_TISG.Frame_main import FrameMain
 
 
 def main():
     app = wx.App()
 
-    ventana = frame_main(None, title='Boost Manager', size=(1000, 700))
+    ventana = FrameMain(None, title='Boost Manager', size=(1000, 700))
     try:
         ventana.Show()
     except RuntimeError:
