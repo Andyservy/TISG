@@ -39,22 +39,26 @@ class Verificacion(wx.Dialog):
         super(Verificacion, self).__init__(parent, size=(500, 300), style=wx.BORDER_NONE)
 
         # PROPIEDADES
+        self.inheritance()
 
+        self.Centre()
         self.Colour = "#212F3C"
         self.SetBackgroundColour(self.Colour)
-        self.Centre()
 
         Panel(self)
 
         # ATRIBUTOS_TimeRunUpDate
 
-        self.User = "Andy"
+    @classmethod
+    def inheritance(cls):
+        cls.User = "Andy"
 
 
-class Panel(wx.Panel):
+class Panel(wx.Panel, Verificacion):
 
     def __init__(self, parent):
-        super(Panel, self).__init__(parent)
+        wx.Panel.__init__(self, parent)
+        super(Panel, self).inheritance()
 
         self.initGUI()
 
@@ -97,6 +101,10 @@ class Panel(wx.Panel):
         Box_Entrada.Add(ENTRADA_Contraseña, 1, wx.EXPAND | wx.ALL, 10)
         self.ENTRADA_Contraseña = ENTRADA_Contraseña
 
+        """Esto es parcialmente incorrecto, pero gracias a ello puedo usar estos dos atributos dentro de las 
+        funciones, o sea, asignar a un atributo una variable, lo cual hace que paresca que si esta dentro del 
+        __init__ """
+
         BTN_OK = wx.Button(self, -1, 'OK')
 
         BTN_Cancel = wx.Button(self, -1, "CANCEL")
@@ -121,10 +129,6 @@ class Panel(wx.Panel):
         ENTRADA_Name.SetFont(Font_Entrada)
         ENTRADA_Contraseña.SetFont(Font_Entrada)
 
-        Font_Botones = wx.Font(18, wx.ROMAN, wx.NORMAL, wx.NORMAL)
-        BTN_OK.SetFont(Font_Botones)
-        BTN_Cancel.SetFont(Font_Botones)
-
         # MODIFICANDO COLOR
 
         ENTRADA_Name.SetBackgroundColour('#283747')
@@ -140,11 +144,15 @@ class Panel(wx.Panel):
 
         BTN_OK.Bind(wx.EVT_BUTTON, self.OnClickOK)
         BTN_Cancel.Bind(wx.EVT_BUTTON, self.GrandParent.OnClickCancel)
+        BTN_Cancel.Bind(wx.EVT_BUTTON, self.OnClickCancel)
 
     def OnClickOK(self, event):
 
-        Nombre_Entrada = 'señora'  # self.ENTRADA_Name.GetValue()
-        Contraseña_Entrada = '123456'  # self.ENTRADA_Contraseña.GetValue()
+        Nombre_Entrada = "usuario"  # self.Entrada_Name.GetValue()
+        Contraseña_Entrada = "123456"  # self.ENTRADA_Contraseña.GetValue()
+        """Como se puede evidenciar, estoy usando los atributos de Entrada_Name pertenecientes al panel; sin embargo 
+        esto no sería posible si haber instanciado como atributo el Entrada_Name """
+
         Summoner = self.GrandParent  # Llamamos al objeto que llama a Verificación
 
         consult_mysql = "SELECT Contraseña FROM login_history WHERE Nombre_User = '{0}'".format(Nombre_Entrada)
@@ -164,15 +172,14 @@ class Panel(wx.Panel):
 
                     self.cursor.execute(consult_Datos)
                     Login = self.cursor.fetchall()
-                    self.Parent.User = Login[0][0]
-
+                    # self.User = Login[0][0]
                     Summoner.OnClickOK()  # Dentro del super padre, hay un método, esta función ejecuta
                     # lo que se debe hacer después
 
                     """
-                    Para destruir la ventana directamente, se necesita especificar el parámetro en Panel, 
+                    Para destruir la ventana directamente, se necesita especificar el parámetro en Panel,
                     para que, al ser dhbusado en Ventana, se introduzca un self, así:
-                    
+
                     import wx
 
                     class MainScene(wx.Frame):
@@ -197,9 +204,9 @@ class Panel(wx.Panel):
                         exit_button.Bind(wx.EVT_BUTTON, self.onClose)
                         vbox.Add(exit_button, proportion=1, flag=wx.ALL | wx.CENTER, border=5)
                         self.SetSizer(vbox)
-                    
-                      def onClose(self, event): 
-                        print('Called from SubPanel')      
+
+                      def onClose(self, event):
+                        print('Called from SubPanel')
                         self.mainWin.Destroy()
                     """  # Si alguna vez se necesita especificar que es lo que se debe cerrar
 
@@ -210,4 +217,8 @@ class Panel(wx.Panel):
                 show_messange(Panel, "Usuario no existente")
 
         else:
-            show_messange(Panel, "Nombre_Entrada de usuario o la contraseña no deberían estar vacíos")
+            show_messange(Panel, "Nombre de usuario o la contraseña no deberían estar vacíos")
+
+    def OnClickCancel(self, event):
+        self.Parent.Close()
+        event.Skip()

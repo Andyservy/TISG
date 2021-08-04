@@ -14,21 +14,23 @@ class Btnbicolor(object):
             print('Se omitieron valores', Btnbicolor, ',se consideran solo dos valores')
             exit()
 
+        self.Font_Botones = wx.Font(18, wx.ROMAN, wx.NORMAL, wx.NORMAL)
         self.Coletionbutton(botones, color_0)
         self.OFF = color_0
 
-    def Coletionbutton(self, Botones_stylecmn, Colour):
+    def Coletionbutton(self, botones_stylecmn, colour):
 
-        for Button in Botones_stylecmn:
-            Button.SetBackgroundColour(Colour)
+        for Button in botones_stylecmn:
+            Button.SetFont(self.Font_Botones)
+            Button.SetBackgroundColour(colour)
             Button.SetWindowStyleFlag(wx.BORDER_NONE)
             self.builtButtons(Button)
 
-    def builtButtons(self, BTN):
-        BTN.Bind(wx.EVT_ENTER_WINDOW, self.OnEnter)
-        BTN.Bind(wx.EVT_LEAVE_WINDOW, self.OnLeave)
-        BTN.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
-        BTN.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
+    def builtButtons(self, btn):
+        btn.Bind(wx.EVT_ENTER_WINDOW, self.OnEnter)
+        btn.Bind(wx.EVT_LEAVE_WINDOW, self.OnLeave)
+        btn.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
+        btn.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
 
     def OnLeftDown(self, event):
         BTN = event.GetEventObject()
@@ -56,7 +58,6 @@ class Btnbicolor(object):
 
     def OnLeave(self, event):
         BTN = event.GetEventObject()
-
         BTN.SetBackgroundColour(self.OFF)
         # event.Skip()
 

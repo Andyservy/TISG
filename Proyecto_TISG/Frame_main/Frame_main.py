@@ -2,35 +2,40 @@
 import wx
 
 # Package Project
-from Proyecto_TISG.Frame_main.Menú_main import MenuMain
+from Proyecto_TISG.Frame_main.TOPTAB.Barra_Usuario import TopUsuario
+from Proyecto_TISG.Frame_main.Menu_Main import MenuTab
 from Proyecto_TISG.Package.Formulary import Verificacion
 from Proyecto_TISG import connection
 
 
 class FrameMain(wx.Frame):
-    def __init__(self, parent, title, size):
-        super(FrameMain, self).__init__(parent, title=title, size=size)
+    def __init__(self, parent, title):
+        super(FrameMain, self).__init__(parent, title=title, size=(1000, 700))
 
         self.Centre()
+
         self.Color = "#212F3C"
-
-        self.Formulario = Verificacion(self)
-        self.User_name = self.Formulario.User
-
+        self.User_Name = Verificacion(self).User
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(self.sizer)
 
         self.GUI_init()
 
+        self.Show()
+
     def GUI_init(self):
+
+        self.SetSizer(self.sizer)
+
         # Verificación
 
-        self.Formulario.ShowModal()
+        Verificacion(self).ShowModal()
 
         # EVENTOS
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
         # PANELES PRINCIPALES
+
+    # EVENTOS
 
     def OnClose(self, event):
         connection().close()
@@ -40,8 +45,8 @@ class FrameMain(wx.Frame):
     # VERIFICACIÓN
 
     def OnClickOK(self):
-        Pl_MenuMain = MenuMain(self)
-        self.sizer.Add(Pl_MenuMain, 1, wx.EXPAND)
+        self.sizer.Add(TopUsuario(self), 1, wx.EXPAND)
+        self.sizer.Add(MenuTab(self), 4, wx.EXPAND)
 
     def OnClickCancel(self, event):
         self.Close()
@@ -52,9 +57,7 @@ Al usar show () fuera de la definición de los atributos, se debe establecer una
 acumula al Frame, ya que con esto se está resolviendo el primer parámetro, que en este caso sería self (solo admite 
 de tipo window, y la variable a la que asignamos el frame se vuelve de esa clase)
 Example:
-
 - Frame.Show(self:No esta llenado, Bool: True)
 - Variable = Frame(Parámetros)
   Variable.Show(self:Variable, Bool:True)
-
 """

@@ -8,6 +8,8 @@ wxpython = "*"
 mysql-connector = "*"
 nose2 = "*"
 pyinstaller = "*"
+numpy = "*"
+matplotlib = "*"
 
 [dev-packages]
 
