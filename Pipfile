@@ -10,6 +10,7 @@ nose2 = "*"
 pyinstaller = "*"
 numpy = "*"
 matplotlib = "*"
+psycopg2 = "*"
 
 [dev-packages]
 

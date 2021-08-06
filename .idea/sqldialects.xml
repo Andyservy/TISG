@@ -2,7 +2,7 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/Proyecto_TISG/Frame_main/Configuración/Configuración_Panel.py" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/Proyecto_TISG/Frame_main/Facturación/DataFT.py" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Proyecto_TISG/Frame_main/Facturación/UpDateDataFT.py" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/Proyecto_TISG/Package/Formulary/Formulary.py" dialect="MySQL" />
   </component>
 </project>

@@ -1,90 +1,114 @@
-# print("This is my file to test Python's execution methods.")
-# print("The variable __name__ tells me which context this file is running in.")
-# print("The value of __name__ is:", repr(__name__))
+# library to import the excel file
+import openpyxl
+# libraries to create the pdf file and add text to it
+from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.pdfmetrics import stringWidth
+from reportlab.pdfbase.ttfonts import TTFont
+# library to get logo related information
+from PIL import Image
 
-#!/usr/bin/env python
-# -*- coding: UTF-8 -*-
+# convert the font so it is compatible
+pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf'))
 
-import wx
-import pymysql
-#Since I am not very familiar with the layout manager,It ’s a fixed position,Causes the window to stretch less well
-class myapp (wx.app):
- def __init__ (self):
-  wx.app .__init__ (self)
-  frame=wx.frame (parent=None, title="login", size=(532,420))
-  #Set the icon in the upper left corner of the window
-  #Where parameter type represents the type of picture,There are also ico, jpgm and other types
-  icon_1=wx.icon (name="python1.png", type=wx.bitmap_type_png)
-  frame.seticon (icon_1)
-  panel=wx.panel (frame, -1)
-  #Add images to panel
-  image=wx.image ("python2.jpg", wx.bitmap_type_jpeg) .converttobitmap ()
-  wx.staticbitmap (panel, -1, bitmap=image, pos=(0, 0))
-  #Add static tags
-  label_user=wx.statictext (panel, -1, "Account:", pos=(80,200))
-  label_pass=wx.statictext (panel, -1, "Password:", pos=(80,240))
-  #Add text input box
-  self.entry_user=wx.textctrl (panel, -1, size=(200,30), pos=(130,200))
-  #style for setting input
-  self.entry_pass=wx.textctrl (panel, -1, size=(200,30), pos=(130,240), style=wx.te_password)
-  #Add button
-  self.but_login=wx.button (panel, -1, "login", size=(120,50), pos=(120,300))
-  self.but_register=wx.button (panel, -1, "register", size=(120,50), pos=(260,300))
-  #Set the color of the button
-  self.but_login.setbackgroundcolour ("#0a74f7")
-  self.but_register.setbackgroundcolour ("#282c34")
-  #Binding events to buttons
-  self.bind (wx.evt_button, self.on_but_login, self.but_login)
-  self.bind (wx.evt_button, self.on_but_register, self.but_register)
-  #
-  frame.center()
-  frame.show(True)
- #Define a message popup box function
- def show_message (self, word=""):
-  dlg=wx.messagedialog (None, word, u"error", wx.yes_no | wx.icon_question)
-  if dlg.showmodal () == wx.id_yes:
-   #self.close (true)
-   pass
-  dlg.destroy ()
- def on_but_login (self, event):
-  #Connect to the local database
-  user_name=self.entry_user.getvalue ()
-  pass_word=self.entry_pass.getvalue ()
-  sql="" "select pass from student where name ="%s "" ""%(user_name)
-  #Judge, check if the username and password are empty
-  #Not empty after query and judgment
-  #Otherwise, it will cause errors when the password or username is empty
-  if user_name and pass_word:
-   db=pymysql.connect (host="localhost", user="root",   password="zhang123", db="user", port=3306)
-   #Use cursor () method to obtain the operation cursor
-   cur=db.cursor ()
-   try:
-    cur.execute (sql) #execute SQL statement
-    results=cur.fetchall () #Get all records of the query
-    #The return value is in the form of a tuple
-    #print (type (results))
-    if results:
-     #print (type (results [0] [0]))
-     #print (results [0] [0])
-     if results [0] [0] == pass_word:
-      #Means login is successful,Follow-up can write the interface after successful login
-      #Will not write here
-      pass
-      #print ("sucessful")
-     else:
-      self.show_message (word="password error")
-    else:
-     self.show_message (word="username does not exist")
-   except exception as e:
-    db.rollback ()
-   finally:
-    db.close () #Close the connection
-  else:
-   self.show_message (word="Account and password cannot be empty")
- def on_but_register (self, event):
-  #Similar to the query above,Just get the relevant content and insert it into the database to make related operations
-  #Content is similar to the above,No longer writing
-  pass
-if __name__ == "__ main__":
- app=myapp ()
- app.mainloop ()
+# import the sheet from the excel file
+wb = openpyxl.load_workbook('C:\\Users\\Gebruiker\\Desktop\\tutorial\\data.xlsx')
+sheet = wb.get_sheet_by_name('invoices')
+
+# import company's logo
+im = Image.open('logo.jpg')
+width, height = im.size
+ratio = width / height
+image_width = 400
+image_height = int(image_width / ratio)
+
+# Page information
+page_width = 2156
+page_height = 3050
+
+# Invoice variables
+company_name = 'The best company in the world'
+payment_terms = 'x'
+contact_info = 'x'
+margin = 100
+month_year = 'August 2019'
+
+
+# def function
+def create_invoice():
+    for i in range(2, 22):
+        # Reading values from excel file
+        customer = sheet.cell(row=i, column=3).value
+        invoice_number = sheet.cell(row=i, column=1).value
+        invoice_date = sheet.cell(row=i, column=8).value
+        due_date = sheet.cell(row=i, column=9).value
+        description = sheet.cell(row=i, column=4).value.lower()
+        amount_excl_vat = sheet.cell(row=i, column=5).value
+        vat = sheet.cell(row=i, column=6).value
+        total_amount = sheet.cell(row=i, column=7).value
+
+        # Creating a pdf file and setting a naming convention
+        c = canvas.Canvas(str(invoice_number) + '_' + str(customer) + '.pdf')
+        c.setPageSize((page_width, page_height))
+
+        # Drawing the image
+        c.drawInlineImage("C:\\Users\\Gebruiker\\Desktop\\tutorial\\logo.jpg", page_width - image_width - margin,
+                          page_height - image_height - margin,
+                          image_width, image_height)
+
+        # Invoice information
+        c.setFont('Arial', 80)
+        text = 'INVOICE'
+        text_width = stringWidth(text, 'Arial', 80)
+        c.drawString((page_width - text_width) / 2, page_height - image_height - margin, text)
+        y = page_height - image_height - margin * 4
+        x = 2 * margin
+        x2 = x + 550
+
+        c.setFont('Arial', 45)
+        c.drawString(x, y, 'Issued by: ')
+        c.drawString(x2, y, company_name)
+        y -= margin
+
+        c.drawString(x, y, 'Issued to: ')
+        c.drawString(x2, y, customer)
+        y -= margin
+
+        c.drawString(x, y, 'Invoice number: ')
+        c.drawString(x2, y, str(invoice_number))
+        y -= margin
+
+        c.drawString(x, y, 'Invoice date: ')
+        c.drawString(x2, y, invoice_date)
+        y -= margin
+
+        c.drawString(x, y, 'Due date: ')
+        c.drawString(x2, y, due_date)
+        y -= margin * 2
+
+    c.drawString(x, y, 'Invoice issued for performed ' + description + ' for ' + month_year)
+    y -= margin * 2
+
+    c.drawString(x, y, 'Amount excluding VAT: ')
+    c.drawString(x2, y, 'EUR ' + str(amount_excl_vat))
+    y -= margin
+
+    c.drawString(x, y, 'Value added tax: ')
+    c.drawString(x2, y, 'EUR ' + str(vat))
+    y -= margin
+
+    c.drawString(x, y, 'Total amount: ')
+    c.drawString(x2, y, 'EUR ' + str(total_amount))
+    y -= margin * 3
+
+    c.drawString(x, y, 'If paid within 10 days, 2% of discount is granted.')
+    y -= margin
+    c.drawString(x, y, 'Bank account number: 1234 ABCD 4567 EFGH')
+    y -= margin
+    c.drawString(x, y, 'In case of any questions, contact info@thebestcompany.com')
+
+    # Saving the pdf file
+    c.save()
+
+
+create_invoice()

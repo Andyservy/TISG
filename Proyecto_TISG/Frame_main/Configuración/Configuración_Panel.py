@@ -214,8 +214,6 @@ class PanelConfi(wx.Panel):
                 pass
 
             else:
-                print(Estado_User[1][0])
-                print(Estado_User[0][0])
                 self.cursor.execute("UPDATE login_history SET Nombre_User = '{0}' WHERE "
                                     "Nombre_User = '{1}'".format(Estado_User[1][0], Estado_User[0][0]))
                 connection().commit()
@@ -287,7 +285,6 @@ class PanelConfi(wx.Panel):
                     pass
 
                 else:
-                    print(str(Verificación[1][1]))
                     self.cursor.execute(
                         "DELETE FROM login_history WHERE Contraseña = '{0}'".format(Verificación[1][1]))
                     connection().commit()

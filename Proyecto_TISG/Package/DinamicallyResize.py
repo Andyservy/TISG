@@ -44,7 +44,7 @@ class PhotoCtrl(object):
     def onView(self):
         self.filepath = self.Path
         img = self.scale_image()
-        self.BPM.SetBitmap(wx.BitmapFromImage(img))
+        self.BPM.SetBitmap(wx.Bitmap(img))
         self.Parent.Refresh()
         self.image_loaded = True
 
@@ -55,7 +55,7 @@ class PhotoCtrl(object):
 
                 self.PhotoMaxSize = self.current_size.GetHeight() - 30
                 img = self.scale_image()
-                self.BPM.SetBitmap(wx.BitmapFromImage(img))
+                self.BPM.SetBitmap(wx.Bitmap(img))
                 self.Parent.Refresh()
                 self.Parent.Layout()
 

@@ -7,7 +7,9 @@ Preview_Billing = ['C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Factura ord
                    'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Pagaré.png',
                    'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Less focus.png']
 
-list_DatosEmpresa = ['RazónSocial', 'DireccionMatriz', 'RUC', 'Resumen', 'IGV', 'TipoEmpresa', 'Telefono']
+list_DatosEmpresa = ['RazonSocial', 'DireccionMatriz', 'RUC', 'Resumen', 'IGV', 'TipoEmpresa', 'Telefono']
 
 TiposEmpresa = ['SA', 'SAC', 'SRL', 'EIRL', 'SAA', '']
+
+Consult_DataEmpresa = "SELECT * FROM DataEmpresa"
 

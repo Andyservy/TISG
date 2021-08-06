@@ -24,9 +24,9 @@ class Panel_DataFT(wx.Panel):
 
     def __init__(self, parent):
         super(Panel_DataFT, self).__init__(parent)
-        self.initGUI()
 
         self.cursor = connection().cursor()
+        self.initGUI()
 
     def initGUI(self):
 
@@ -75,8 +75,8 @@ class Panel_DataFT(wx.Panel):
         self.BTN_Guardar.Disable()
         box_BtnAction.Add(self.BTN_Guardar, 1, wx.EXPAND | wx.ALL, 20)
 
-        BTN_Cancelar = wx.Button(self, -1, "CANCELAR")
-        box_BtnAction.Add(BTN_Cancelar, 1, wx.EXPAND | wx.ALL, 20)
+        BTN_CERRAR = wx.Button(self, -1, "CERRAR")
+        box_BtnAction.Add(BTN_CERRAR, 1, wx.EXPAND | wx.ALL, 20)
 
         # Estilo
         label_Titulo_Font = wx.Font(20, wx.MODERN, wx.NORMAL, wx.NORMAL)
@@ -87,7 +87,7 @@ class Panel_DataFT(wx.Panel):
             _.SetFont(label_Font)
             _.SetForegroundColour('#CBC0C0')
 
-        Botones = [self.BTN_Guardar, BTN_Cancelar]
+        Botones = [self.BTN_Guardar, BTN_CERRAR]
         Btnbicolor(Botones, '#2C4158', '#384A5F')
 
         # Sizer
@@ -99,42 +99,40 @@ class Panel_DataFT(wx.Panel):
 
         # Eventos
 
-        BTN_Cancelar.Bind(wx.EVT_BUTTON, self.OnClickCancel)
+        BTN_CERRAR.Bind(wx.EVT_BUTTON, self.OnClickCancel)
         self.BTN_Guardar.Bind(wx.EVT_BUTTON, self.OnClickGuardar)
-        choc_TipoEmpresa.Bind(wx.EVT_CHOICE, self.ChoiceTipoEmpresa)
 
         for r in ctrl:
-            r.Bind(wx.EVT_TEXT, self.OnTextFill)
+
+            if str(r.GetId()) == str(choc_TipoEmpresa.GetId()):
+                choc_TipoEmpresa.Bind(wx.EVT_CHOICE, self.ChoiceTipoEmpresa)
+
+            else:
+                r.Bind(wx.EVT_TEXT, self.OnTextFill)
 
             if str(r.GetId()) == str(ctrl_NRUC.GetId()) or str(r.GetId()) == str(ctrl_IGV.GetId()):
                 r.Bind(wx.EVT_CHAR, self.OnTextChar)
 
             self.CTRL = ctrl
 
-    def OnTextFill(self, event):
-        Object = event.GetEventObject()
-
+    # Coleccionar los valores llenos
+    def Values_Fill(self):
         ctrlValue = [self.CTRL[0].GetValue(), self.CTRL[1].GetValue(), self.CTRL[2].GetValue(), self.CTRL[3].GetValue(),
                      self.CTRL[4].GetValue(), self.CTRL[5].GetString(self.CTRL[5].GetSelection()),
                      self.CTRL[6].GetValue()]
 
         self.ctrlValue = ctrlValue
 
-        if str(Object.GetId()) == str(self.CTRL[5].GetId()):
+    def OnTextFill(self, event):
+        self.Values_Fill()
+        Object = event.GetEventObject()
 
-            if Object.GetString(Object.GetSelection()):
-                self.BTN_Guardar.Enable()
-
-            else:
-                self.BTN_Guardar.Disable()
-
+        if len(Object.GetValue()):
+            self.BTN_Guardar.Enable()
         else:
-            if len(Object.GetValue()):
-                self.BTN_Guardar.Enable()
-            else:
-                self.BTN_Guardar.Disable()
+            self.BTN_Guardar.Disable()
 
-        for _ in ctrlValue:
+        for _ in self.ctrlValue:
             if _:
                 self.BTN_Guardar.Enable()
 
@@ -166,6 +164,7 @@ class Panel_DataFT(wx.Panel):
     def ChoiceTipoEmpresa(self, event):
         choice = event.GetEventObject()
         Selection = choice.GetString(choice.GetSelection())
+
         self.BTN_Guardar.Enable()
 
         if Selection == '':
@@ -173,13 +172,19 @@ class Panel_DataFT(wx.Panel):
 
     def OnClickGuardar(self, event):
         x = 0
+        self.Values_Fill()
 
-        for _ in self.CTRL:
+        for _ in self.ctrlValue:
             if _ != '':
-                Consult = "SELECT * FROM datos_empresa_factura;" \
-                          "REPLACE INTO datos_empresa_factura(id, {0}) VALUES(1, {1})".format(list_DatosEmpresa[x], _)
-                self.cursor.execute(Consult)
+                Consulta = """UPDATE DataEmpresa
+                                    SET %s = '%s'
+                                    WHERE id = 1"""
+                self.cursor.execute(Consulta % (list_DatosEmpresa[x], _))
+                connection().commit()
+
             x = x + 1
+
+        self.Parent.Close()
 
     def OnClickCancel(self, event):
         self.Parent.Close()

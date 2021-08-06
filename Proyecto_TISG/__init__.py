@@ -19,4 +19,5 @@ from Proyecto_TISG.info import (__author__,
                                 __description__,
                                 __descriptionfull__, )
 from .data.SERVIRDOR.DATABASE import connection
+from .data.SERVIRDOR.DATABASE import column_name
 

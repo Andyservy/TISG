@@ -2,7 +2,9 @@ import wx
 
 from Proyecto_TISG.Variables import *
 from Proyecto_TISG.Package import Btnbicolor, PhotoCtrl
-from Proyecto_TISG.Frame_main.Facturación import DataFacturacion
+
+# Scripts
+from Proyecto_TISG.Frame_main.Facturación import DataFacturacion, ComercialBillings
 
 
 class MenuTab(wx.Notebook):
@@ -64,29 +66,33 @@ class Facturacion(wx.Panel, MenuTab):
         Btn_CommercialBilling.Bind(wx.EVT_ENTER_WINDOW, self.OnEnterCB)
         Btn_SumUpBilling.Bind(wx.EVT_ENTER_WINDOW, self.OnEnterSUB)
         Btn_PromissoryNote.Bind(wx.EVT_ENTER_WINDOW, self.OnEnterPN)
+        Btn_CommercialBilling.Bind(wx.EVT_BUTTON, self.OnCliclkCB)
 
         Btn_Descripcion.Bind(wx.EVT_BUTTON, self.OnClickD)
 
     def OnEnterCB(self, event):
         Image0 = wx.Image(Preview_Billing[0], wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-        self.bmp_Focusless.SetBitmap(wx.BitmapFromImage(Image0))
+        self.bmp_Focusless.SetBitmap(wx.Bitmap(Image0))
         PhotoCtrl(self, Preview_Billing[0], self.bmp_Focusless)
         event.Skip()
 
     def OnEnterSUB(self, event):
         Image1 = wx.Image(Preview_Billing[1], wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-        self.bmp_Focusless.SetBitmap(wx.BitmapFromImage(Image1))
+        self.bmp_Focusless.SetBitmap(wx.Bitmap(Image1))
         PhotoCtrl(self, Preview_Billing[1], self.bmp_Focusless)
         event.Skip()
 
     def OnEnterPN(self, event):
         Image2 = wx.Image(Preview_Billing[2], wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-        self.bmp_Focusless.SetBitmap(wx.BitmapFromImage(Image2))
+        self.bmp_Focusless.SetBitmap(wx.Bitmap(Image2))
         PhotoCtrl(self, Preview_Billing[2], self.bmp_Focusless)
         event.Skip()
 
     def OnClickD(self, event):
         DataFacturacion(self).ShowModal()
+
+    def OnCliclkCB(self, event):
+        ComercialBillings(self)
 
 # Referencia
 # Factura ordinaria = https://www.finanzarel.com/blog/factura-ordinaria-caracteristicas-ejemplos-y-plantillas/
