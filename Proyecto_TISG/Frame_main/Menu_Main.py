@@ -5,25 +5,20 @@ from Proyecto_TISG.Package import Btnbicolor, PhotoCtrl
 
 # Scripts
 from Proyecto_TISG.Frame_main.Facturación import DataFacturacion, ComercialBillings
-
-
-class MenuTab(wx.Notebook):
-    def __init__(self, parent):
-        super(MenuTab, self).__init__(parent, style=wx.NB_LEFT | wx.BORDER_NONE)
-
-        self.AddPage(Facturacion(self), "Facturación")
-        self.SetBackgroundColour(Color)
+from Proyecto_TISG.Frame_main import MenuTab
+from Proyecto_TISG.Frame_main import FrameMain
 
 
 class Facturacion(wx.Panel, MenuTab):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
+        MenuTab.Attribute(self)
 
         self.SetBackgroundColour(Color)
         self.init_GUI()
 
     def init_GUI(self):
-        Box_Main = wx.BoxSizer(wx.VERTICAL)
+        self.Box_Main = wx.BoxSizer(wx.VERTICAL)
         Box_TopBar = wx.BoxSizer(wx.HORIZONTAL)
         Box_Billing = wx.BoxSizer(wx.VERTICAL)
         Box_Preview = wx.BoxSizer(wx.VERTICAL)
@@ -58,9 +53,9 @@ class Facturacion(wx.Panel, MenuTab):
         Box_TopBar.Add(Box_Billing, 3, wx.EXPAND)
         Box_TopBar.Add(Box_Preview, 1, wx.EXPAND)
 
-        Box_Main.Add(Box_TopBar, 1, wx.EXPAND)
+        self.Box_Main.Add(Box_TopBar, 1, wx.EXPAND)
 
-        self.SetSizer(Box_Main)
+        self.SetSizer(self.Box_Main)
 
         # Eventos
         Btn_CommercialBilling.Bind(wx.EVT_ENTER_WINDOW, self.OnEnterCB)
@@ -92,7 +87,15 @@ class Facturacion(wx.Panel, MenuTab):
         DataFacturacion(self).ShowModal()
 
     def OnCliclkCB(self, event):
-        ComercialBillings(self)
+        self.GrandParent.TopUsuario.Hide()
+
+        self.Box_Main.ShowItems(show=False)
+        self.SetBackgroundColour('#7786DE')
+
+        self.SetSizer(ComercialBillings(self))
+
+        self.Layout()
+        self.GrandParent.Layout()
 
 # Referencia
 # Factura ordinaria = https://www.finanzarel.com/blog/factura-ordinaria-caracteristicas-ejemplos-y-plantillas/

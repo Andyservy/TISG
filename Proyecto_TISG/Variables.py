@@ -7,9 +7,17 @@ Preview_Billing = ['C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Factura ord
                    'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Pagaré.png',
                    'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Less focus.png']
 
+Productos_Pres = ['C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Tubos pvc.png',
+                  'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Pacasmayo.png',
+                  'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Fierros.png']
+
 list_DatosEmpresa = ['RazonSocial', 'DireccionMatriz', 'RUC', 'Resumen', 'IGV', 'TipoEmpresa', 'Telefono']
 
 TiposEmpresa = ['SA', 'SAC', 'SRL', 'EIRL', 'SAA', '']
+
+ResponsableCompraVenta = ['Empresa', 'Individuo']
+TipoDePago = ['Cheque', 'Transferencia', 'Giro', 'Bancario', 'Contado']
+Comprobante = ['Boleta de venta', 'Factura']
 
 Consult_DataEmpresa = "SELECT * FROM DataEmpresa"
 

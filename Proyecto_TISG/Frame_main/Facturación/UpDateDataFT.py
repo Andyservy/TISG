@@ -3,6 +3,7 @@ import wx
 from Proyecto_TISG.Variables import *
 from Proyecto_TISG.Package import Btnbicolor
 from Proyecto_TISG import connection
+from Proyecto_TISG.Package import JustInt
 
 
 class DataFacturacion(wx.Dialog):
@@ -110,8 +111,9 @@ class Panel_DataFT(wx.Panel):
             else:
                 r.Bind(wx.EVT_TEXT, self.OnTextFill)
 
-            if str(r.GetId()) == str(ctrl_NRUC.GetId()) or str(r.GetId()) == str(ctrl_IGV.GetId()):
-                r.Bind(wx.EVT_CHAR, self.OnTextChar)
+            if str(r.GetId()) == str(ctrl_NRUC.GetId()) or str(r.GetId()) == str(ctrl_IGV.GetId()) \
+                    or str(r.GetId()) == str(ctrl_Telefono.GetId()):
+                JustInt(r)
 
             self.CTRL = ctrl
 
