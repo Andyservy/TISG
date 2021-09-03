@@ -9,7 +9,7 @@ from Proyecto_TISG import connection
 
 class FrameMain(wx.Frame):
     def __init__(self, parent, title):
-        super(FrameMain, self).__init__(parent, title=title, size=(1000, 700))
+        super(FrameMain, self).__init__(parent, title=title, size=(1000, 730))
         self.Attribute()
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)

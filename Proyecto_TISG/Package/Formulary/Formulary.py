@@ -35,15 +35,21 @@ class Verificacion(wx.Dialog):
 
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent, place=None):
         super(Verificacion, self).__init__(parent, size=(500, 300), style=wx.BORDER_NONE)
 
         # PROPIEDADES
+
         self.inheritance()
 
         self.Centre()
         self.Colour = "#212F3C"
         self.SetBackgroundColour(self.Colour)
+
+        if place is None:
+            place = self.Parent
+
+        self.Place = place
 
         Panel(self)
 
@@ -153,7 +159,7 @@ class Panel(wx.Panel, Verificacion):
         """Como se puede evidenciar, estoy usando los atributos de Entrada_Name pertenecientes al panel; sin embargo 
         esto no sería posible si haber instanciado como atributo el Entrada_Name """
 
-        Summoner = self.GrandParent  # Llamamos al objeto que llama a Verificación
+        # Llamamos al objeto que llama a Verificación
 
         consult_mysql = "SELECT Contraseña FROM login_history WHERE Nombre_User = '{0}'".format(Nombre_Entrada)
         consult_Datos = "SELECT * FROM login_history"
@@ -173,7 +179,7 @@ class Panel(wx.Panel, Verificacion):
                     self.cursor.execute(consult_Datos)
                     Login = self.cursor.fetchall()
                     # self.User = Login[0][0]
-                    Summoner.OnClickOK()  # Dentro del super padre, hay un método, esta función ejecuta
+                    self.Parent.Place.OnClickOK()  # Dentro del super padre, hay un método, esta función ejecuta
                     # lo que se debe hacer después
 
                     """
