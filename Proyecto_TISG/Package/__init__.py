@@ -4,4 +4,6 @@ from .PG import Btnbicolor, show_messange
 from .Button_Redondo import ShapedButton
 from .DinamicallyResize import PhotoCtrl
 from .JustInt import JustInt
+from .AutoComplete import AutoComplete
+from .AgregarCantidad import CantidadAdicional
 

@@ -1,3 +1,6 @@
+from Proyecto_TISG.data.SERVIRDOR.DATABASE import connection
+
+cursor = connection().cursor()
 Icon_Home = ['C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Home.png',
              'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Home_click.png']
 Color = "#212F3C"
@@ -29,6 +32,14 @@ TipoDePago = ['Cheque', 'Transferencia', 'Contado']
 Comprobante = ['Boleta de venta', 'Factura']
 Serie = ['F-', 'B-', 'R-']
 
-Consult_DataEmpresa = "SELECT * FROM DataEmpresa"
+cursor.execute("SELECT * FROM DataEmpresa")
+Consult_DataEmpresa = cursor.fetchone()
 
-Conteo_Factura = 'SELECT COUNT(*) FROM factura_ordinaria'
+cursor.execute("SELECT COUNT(*) FROM factura_ordinaria")
+Conteo_FacturaOrdinaria = cursor.fetchone()
+
+cursor.execute("SELECT COUNT(*) FROM factura")
+Conteo_Factura = cursor.fetchone()
+
+cursor.execute("SELECT COUNT(*) FROM productos_compra")
+Filas_Productos = cursor.fetchone()

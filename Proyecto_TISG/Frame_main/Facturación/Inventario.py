@@ -1,6 +1,6 @@
 import wx
 import wx.grid as grid
-from datetime import datetime
+import time
 
 from Proyecto_TISG.Variables import *
 from Proyecto_TISG.Package import ShapedButton, Btnbicolor, show_messange
@@ -109,19 +109,19 @@ class Inventario(object):
         productos_compra.NOMBRE_PRODUCTO,
         productos_compra.PRECIO_COMPRA,
         productos_compra.PRECIO_VENTA,
-        productos_compra.FECHA,
+        DATE_FORMAT(productos_compra.Fecha, '%Y-%d-%m'),
         factura.RUC,
         productos_compra.CANTIDAD,       
         productos_compra.DESCRIPCION
         FROM productos_compra, factura """)
-        productos = self.parent.cursor.fetchall()
+        self.ProductoTable = self.parent.cursor.fetchall()
 
         for x in range(self.Producto[0].GetNumberRows()):
             term = False
 
             for _ in range(8):
                 try:
-                    self.Producto[0].SetCellValue(x, _, "{0}".format(productos[x][_]))
+                    self.Producto[0].SetCellValue(x, _, "{0}".format(self.ProductoTable[x][_]))
 
                 except IndexError:
                     term = True
@@ -172,24 +172,32 @@ class Inventario(object):
 
             else:
                 if Filas[y][1] != '' and Filas[y][2] != '' and Filas[y][3] != '' and Filas[y][4] != '' and Filas[y][6] \
-                        != '' and Filas[y][7] != '':
+                        != '':
 
-                    self.parent.cursor.execute("""SELECT COUNT(*) FROM productos_compra""")
-                    numFilas = self.parent.cursor.fetchone()
+                    for e in self.ProductoTable:
+                        ProductosTable = [str(r) for r in e]
 
-                    self.parent.cursor.execute("""SELECT idProductos_Compra FROM productos_compra 
-                    WHERE idProductos_Compra = '{0}'""".format(Filas[y][0]))
-                    exist = self.parent.cursor.fetchone()
+                        if Filas[y] == ProductosTable:
+                            pass
 
-                    if exist:
-                        pass
+                        elif int(Filas[y][0]) <= Filas_Productos[0]:
+                            self.parent.cursor.execute("""UPDATE productos_compra 
+                            SET Nombre_Producto = '{0}',
+                            Precio_Compra = '{1}',
+                            Precio_Venta = '{2}',
+                            Fecha = '{3}',
+                            Cantidad = '{4}',
+                            Descripcion = '{5}'
+                            WHERE idProductos_Compra='{6}'""".format(Filas[y][1], Filas[y][2], Filas[y][3],
+                                                                     Filas[y][4], Filas[y][6], Filas[y][7],
+                                                                     Filas[y][0]))
 
-                    else:
-                        self.parent.cursor.execute("""INSERT INTO productos_compra (IDPRODUCTOS_COMPRA, NOMBRE_PRODUCTO, 
-                        PRECIO_COMPRA, PRECIO_VENTA,  FECHA,FACTURA_IDFACTURA, CANTIDAD, DESCRIPCION) VALUES ('{0}', '{1}', 
-                        '{2}', '{3}' , '{4}', '{5}', '{6}', '{7}')""".format(numFilas[0]+1, Filas[y][1], Filas[y][2],
-                                                                             Filas[y][3], Filas[y][4], 1, Filas[y][6],
-                                                                             Filas[y][7]))
+                        else:
+                            self.parent.cursor.execute("""INSERT INTO productos_compra (IDPRODUCTOS_COMPRA, NOMBRE_PRODUCTO, 
+                            PRECIO_COMPRA, PRECIO_VENTA,  FECHA,FACTURA_IDFACTURA, CANTIDAD, DESCRIPCION) VALUES ('{0}', '{1}', 
+                            '{2}', '{3}' , '{4}', '{5}', '{6}', '{7}')""".format(Filas_Productos[0]+1, Filas[y][1], Filas[y][2],
+                                                                                 Filas[y][3], Filas[y][4], 1, Filas[y][6],
+                                                                                 Filas[y][7]))
 
                     connection().commit()
 
@@ -198,6 +206,7 @@ class Inventario(object):
 
                 else:
                     show_messange(self.parent, "Verifique que los datos esten completos en el item '{0}'".format(x + 1))
+                    break
 
             if vacias == self.Producto[0].GetNumberRows():
                 show_messange(self.parent, "Para poder realizar una alteracion de gran escala necesita permisos")
