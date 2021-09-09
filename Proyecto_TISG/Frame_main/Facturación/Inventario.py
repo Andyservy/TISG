@@ -174,13 +174,16 @@ class Inventario(object):
                 if Filas[y][1] != '' and Filas[y][2] != '' and Filas[y][3] != '' and Filas[y][4] != '' and Filas[y][6] \
                         != '':
 
+                    cursor.execute("SELECT COUNT(*) FROM productos_compra")
+                    Filas_Productos = cursor.fetchone()[0]
+
                     for e in self.ProductoTable:
                         ProductosTable = [str(r) for r in e]
 
                         if Filas[y] == ProductosTable:
-                            pass
+                            break
 
-                        elif int(Filas[y][0]) <= Filas_Productos[0]:
+                        elif int(Filas[y][0]) <= Filas_Productos:
                             self.parent.cursor.execute("""UPDATE productos_compra 
                             SET Nombre_Producto = '{0}',
                             Precio_Compra = '{1}',
@@ -195,9 +198,14 @@ class Inventario(object):
                         else:
                             self.parent.cursor.execute("""INSERT INTO productos_compra (IDPRODUCTOS_COMPRA, NOMBRE_PRODUCTO, 
                             PRECIO_COMPRA, PRECIO_VENTA,  FECHA,FACTURA_IDFACTURA, CANTIDAD, DESCRIPCION) VALUES ('{0}', '{1}', 
-                            '{2}', '{3}' , '{4}', '{5}', '{6}', '{7}')""".format(Filas_Productos[0]+1, Filas[y][1], Filas[y][2],
+                            '{2}', '{3}' , '{4}', '{5}', '{6}', '{7}')""".format(Filas_Productos+1, Filas[y][1], Filas[y][2],
                                                                                  Filas[y][3], Filas[y][4], 1, Filas[y][6],
                                                                                  Filas[y][7]))
+                            Filas_Productos = Filas_Productos + 1
+
+                            break
+
+
 
                     connection().commit()
 

@@ -36,10 +36,14 @@ cursor.execute("SELECT * FROM DataEmpresa")
 Consult_DataEmpresa = cursor.fetchone()
 
 cursor.execute("SELECT COUNT(*) FROM factura_ordinaria")
-Conteo_FacturaOrdinaria = cursor.fetchone()
+Conteo_FacturaOrdinaria = cursor.fetchone()[0]
 
 cursor.execute("SELECT COUNT(*) FROM factura")
-Conteo_Factura = cursor.fetchone()
+Conteo_Factura = cursor.fetchone()[0]
+#cuando poner fetchone soloe scoje el primero, pero aune sta el lista, eso generara error si no corrijes en ComercialBilling
 
-cursor.execute("SELECT COUNT(*) FROM productos_compra")
-Filas_Productos = cursor.fetchone()
+cursor.execute("SELECT IGV FROM dataempresa")
+IGV = cursor.fetchone()[0]
+
+cursor.execute("SELECT COUNT(*) FROM recapitulativa")
+Conteo_Recapitulativa = cursor.fetchone()[0]

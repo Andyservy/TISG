@@ -4,7 +4,7 @@ from Proyecto_TISG.Variables import *
 from Proyecto_TISG.Package import Btnbicolor, PhotoCtrl
 
 # Scripts
-from Proyecto_TISG.Frame_main.Facturación import DataFacturacion, ComercialBillings, Inventario
+from Proyecto_TISG.Frame_main.Facturación import DataFacturacion, ComercialBillings, Inventario, Recapitulativa
 from Proyecto_TISG.Frame_main import MenuTab
 from Proyecto_TISG.Package import ShapedButton
 
@@ -69,6 +69,7 @@ class Facturacion(wx.Panel, MenuTab):
 
         Btn_Descripcion.Bind(wx.EVT_BUTTON, self.OnClickD)
         Btn_Inventario.Bind(wx.EVT_BUTTON, self.OnClickInventario)
+        Btn_SumUpBilling.Bind(wx.EVT_BUTTON, self.OnClickSMB)
 
         return self.Box_Main
 
@@ -85,15 +86,29 @@ class Facturacion(wx.Panel, MenuTab):
         event.Skip()
 
     def OnCliclkCB(self, event):
-
-        Activate = True
+        print(self.GetSize())
         self.GrandParent.TopUsuario.Hide()
         self.Box_Main.ShowItems(show=False)
         self.SetBackgroundColour('#7786DE')
 
-        FacturaComercial = ComercialBillings().Box(self, Activate)
+        FacturaComercial = ComercialBillings().Box(self)
 
         self.SetSizerAndFit(FacturaComercial)
+
+        self.Layout()
+        self.GrandParent.Layout()
+
+        event.Skip()
+
+    def OnClickSMB(self, event):
+
+        self.GrandParent.TopUsuario.Hide()
+        self.Box_Main.ShowItems(show=False)
+
+        FacturaRec = Recapitulativa().Box(self)
+        self.SetBackgroundColour('#7786DE')
+
+        self.SetSizerAndFit(FacturaRec)
 
         self.Layout()
         self.GrandParent.Layout()

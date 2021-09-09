@@ -1,161 +1,107 @@
 #!/usr/bin/env python
+# treectrlwithsplitter.py
 
 import wx
-import os
 
-#----------------------------------------------------------------------
+class MyTree(wx.TreeCtrl):
+    '''Our customized TreeCtrl class
+    '''
+    def __init__(self, parent, id, position, size, style):
+        '''Initialize our tree
+        '''
+        wx.TreeCtrl.__init__(self, parent, id, position, size, style)
+        root = self.AddRoot('Programmer')
+        os = self.AppendItem(root, 'Operating Systems')
+        pl = self.AppendItem(root, 'Programming Languages')
+        tk = self.AppendItem(root, 'Toolkits')
+        self.AppendItem(os, 'Linux')
+        self.AppendItem(os, 'FreeBSD')
+        self.AppendItem(os, 'OpenBSD')
+        self.AppendItem(os, 'NetBSD')
+        self.AppendItem(os, 'Solaris')
+        cl = self.AppendItem(pl, 'Compiled languages')
+        sl = self.AppendItem(pl, 'Scripting languages')
+        self.AppendItem(cl, 'Java')
+        self.AppendItem(cl, 'C++')
+        self.AppendItem(cl, 'C')
+        self.AppendItem(cl, 'Pascal')
+        self.AppendItem(sl, 'Python')
+        self.AppendItem(sl, 'Ruby')
+        self.AppendItem(sl, 'Tcl')
+        self.AppendItem(sl, 'PHP')
+        self.AppendItem(tk, 'Qt')
+        self.AppendItem(tk, 'MFC')
+        self.AppendItem(tk, 'wxPython')
+        self.AppendItem(tk, 'GTK+')
+        self.AppendItem(tk, 'Swing')
 
-#----------------------------------------------------------------------
-# This class is used to provide an interface between a ComboCtrl and the
-# ListCtrl that is used as the popoup for the combo widget.
+class MyFrame(wx.Frame):
+    '''Our customized window class
+    '''
+    def __init__(self, parent, id, title):
+        '''Initialize our window
+        '''
+        wx.Frame.__init__(self, parent, id, title,
+                          wx.DefaultPosition, wx.Size(450, 350))
 
-class ListCtrlComboPopup(wx.ComboPopup):
+        # Create a splitter window
+        self.splitter = wx.SplitterWindow(self, -1)
 
-    def __init__(self):
-        wx.ComboPopup.__init__(self)
-        self.lc = None
+        # Create the left panel
+        leftPanel = wx.Panel(self.splitter, -1)
+        # Create a box sizer that will contain the left panel contents
+        leftBox = wx.BoxSizer(wx.VERTICAL)
 
-    def AddItem(self, txt, _colour):
-        self.lc.InsertItem(self.lc.GetItemCount(), txt)
-        _entry = self.lc.GetItem(self.lc.GetItemCount() - 1)
-        _entry.SetTextColour(_colour)
-        #_entry.SetItemTextColour(_colour)
-        self.lc.SetItem(_entry)
+        # Create our tree and put it into the left panel
+        self.tree = MyTree(leftPanel, 1, wx.DefaultPosition, (-1, -1),
+                           wx.TR_HIDE_ROOT|wx.TR_HAS_BUTTONS)
 
-    def OnMotion(self, evt):
-        item, flags = self.lc.HitTest(evt.GetPosition())
-        if item >= 0:
-            self.lc.Select(item)
-            self.curitem = item
+        # Add the tree to the box sizer
+        leftBox.Add(self.tree, 1, wx.EXPAND)
 
-    def OnLeftDown(self, evt):
-        self.value = self.curitem
-        self.Dismiss()
+        # Bind the OnSelChanged method to the tree
+        self.tree.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelChanged, id=1)
 
+        # Set the size of the right panel to that required by the tree
+        leftPanel.SetSizer(leftBox)
 
-    # The following methods are those that are overridable from the
-    # ComboPopup base class.  Most of them are not required, but all
-    # are shown here for demonstration purposes.
+        # Create the right panel
+        rightPanel = wx.Panel(self.splitter, -1)
+        # Create the right box sizer that will contain the panel's contents
+        rightBox = wx.BoxSizer(wx.VERTICAL)
+        # Create a widget to display static text and store it in the right
+        # panel
+        self.display = wx.StaticText(rightPanel, -1, '', (10, 10),
+                                     style=wx.ALIGN_CENTRE)
+        # Add the display widget to the right panel
+        rightBox.Add(self.display, -1, wx.EXPAND)
+        # Set the size of the right panel to that required by the
+        # display widget
+        rightPanel.SetSizer(rightBox)
+        # Put the left and right panes into the split window
+        self.splitter.SplitVertically(leftPanel, rightPanel)
+        # Create the window in the centre of the screen
+        self.Centre()
 
-    # This is called immediately after construction finishes.  You can
-    # use self.GetCombo if needed to get to the ComboCtrl instance.
-    def Init(self):
-        self.value = -1
-        self.curitem = -1
+    def OnSelChanged(self, event):
+        '''Method called when selected item is changed
+        '''
+        # Get the selected item object
+        item =  event.GetItem()
+        # Display the selected item text in the text widget
+        self.display.SetLabel(self.tree.GetItemText(item))
 
-    # Create the popup child control.  Return true for success.
-    def Create(self, parent):
-        self.lc = wx.ListCtrl(parent, style=wx.LC_SINGLE_SEL | wx.SIMPLE_BORDER | wx.LC_REPORT | wx.LC_NO_HEADER)
-        self.lc.InsertColumn(0, '')
-        self.lc.Bind(wx.EVT_MOTION, self.OnMotion)
-        self.lc.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
+class MyApp(wx.App):
+    '''Our application class
+    '''
+    def OnInit(self):
+        '''Initialize by creating the split window with the tree
+        '''
+        frame = MyFrame(None, -1, 'treectrl.py')
+        frame.Show(True)
+        self.SetTopWindow(frame)
         return True
 
-    # Return the widget that is to be used for the popup
-    def GetControl(self):
-        return self.lc
-
-    # Called just prior to displaying the popup, you can use it to
-    # 'select' the current item.
-    def SetStringValue(self, val):
-        idx = self.lc.FindItem(-1, val)
-        if idx != wx.NOT_FOUND:
-            self.lc.Select(idx)
-
-    # Return a string representation of the current item.
-    def GetStringValue(self):
-        if self.value >= 0:
-            return self.lc.GetItemText(self.value)
-        return ""
-
-    # Called immediately after the popup is shown
-    def OnPopup(self):
-        wx.ComboPopup.OnPopup(self)
-
-    # Called when popup is dismissed
-    def OnDismiss(self):
-        print (self.GetStringValue())
-        wx.ComboPopup.OnDismiss(self)
-
-    # This is called to custom paint in the combo control itself
-    # (ie. not the popup).  Default implementation draws value as
-    # string.
-    def PaintComboControl(self, dc, rect):
-        wx.ComboPopup.PaintComboControl(self, dc, rect)
-
-    # Receives key events from the parent ComboCtrl.  Events not
-    # handled should be skipped, as usual.
-    def OnComboKeyEvent(self, event):
-        wx.ComboPopup.OnComboKeyEvent(self, event)
-
-    # Implement if you need to support special action when user
-    # double-clicks on the parent wxComboCtrl.
-    def OnComboDoubleClick(self):
-        wx.ComboPopup.OnComboDoubleClick(self)
-
-    # Return final size of popup. Called on every popup, just prior to OnPopup.
-    # minWidth = preferred minimum width for window
-    # prefHeight = preferred height. Only applies if > 0,
-    # maxHeight = max height for window, as limited by screen size
-    #   and should only be rounded down, if necessary.
-    def GetAdjustedSize(self, minWidth, prefHeight, maxHeight):
-        return wx.ComboPopup.GetAdjustedSize(self, minWidth, prefHeight, maxHeight)
-
-    # Return true if you want delay the call to Create until the popup
-    # is shown for the first time. It is more efficient, but note that
-    # it is often more convenient to have the control created
-    # immediately.
-    # Default returns false.
-    def LazyCreate(self):
-        return wx.ComboPopup.LazyCreate(self)
-
-#----------------------------------------------------------------------
-
-
-class MyTestPanel(wx.Panel):
-    def __init__(self, parent, log):
-        self.log = log
-        wx.Panel.__init__(self, parent, -1)
-
-        txt = wx.TextCtrl(self, wx.ID_ANY, pos=(100,100))
-
-        comboCtrl = wx.ComboCtrl(self, wx.ID_ANY, "Third item", (10,10), size=(200,-1), style=wx.CB_READONLY)
-        popupCtrl = ListCtrlComboPopup()
-
-        # It is important to call SetPopupControl() as soon as possible
-        comboCtrl.SetPopupControl(popupCtrl)
-
-        # Populate using wx.ListView methods
-        popupCtrl.AddItem("First Item", [255, 127, 0])
-        popupCtrl.AddItem("Second Item", [192, 127, 45])
-        popupCtrl.AddItem("Third Item", [25, 223, 172])
-        #popupCtrl.GetAdjustedSize(100, 35, 100)
-        #comboCtrl.SetTextColour(_colour)
-        comboCtrl.SetForegroundColour(wx.Colour(235, 55, 55))
-
-
-#----------------------------------------------------------------------
-
-def runTest(frame, nb, log):
-    win = MyTestPanel(nb, log)
-    return win
-
-#----------------------------------------------------------------------
-
-
-
-overview = """<html><body>
-<h2><center>wx.combo.ComboCtrl</center></h2>
-
-A combo control is a generic combobox that allows a totally custom
-popup. In addition it has other customization features. For instance,
-position and size of the dropdown button can be changed.
-
-</body></html>
-"""
-
-
 if __name__ == '__main__':
-    import sys,os
-    import run
-    run.main(['', os.path.basename(sys.argv[0])] + sys.argv[1:])
+    app = MyApp(0)
+    app.MainLoop()
