@@ -400,18 +400,22 @@ class ComercialBillings(object):
                                         ClienteIngreso[4]))
                     connection().commit()
 
-                self.parent.cursor.execute("""SELECT idClientes INTO @idCliente FROM clientes WHERE NombreCliente='{0}';
-                    SELECT COUNT(*) INTO @idFactura FROM factura;
+                self.parent.cursor.execute("""SELECT idClientes FROM clientes WHERE NombreCliente='{0}'""".format(Responsable[0]))
+                idCliente = self.parent.cursor.fetchall()
+
+                self.parent.cursor.execute("""SELECT COUNT(*) FROM factura""")
+                numFacturas = self.parent.cursor.fetchall()
+
+                self.parent.cursor.execute("""
                     INSERT INTO factura (idFactura, RUC, Fecha_Limite, Pago, Concepto, Fecha_Factura, 
                     Clientes_idClientes, Total) 
-                    VALUES (@idFactura+1, '{1}', '{2}', '{3}', '{4}', '{5}', @idCliente, '{6}');""".
-                                           format(Responsable[0], RUCEmpresa,
+                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');""".
+                                           format(int(numFacturas[0][0])+1, RUCEmpresa,
                                                   self.Fecha[1].GetValue().Format("%Y-%m-%d"),
                                                   self.ClienteInfo[9].GetStringSelection(),
                                                   self.Distribucion[1].GetStringSelection(),
-                                                  self.Fecha[1].GetValue().Format("%Y-%m-%d"),
-                                                  float(self.Resultados[1].GetValue())),
-                                           multi=True)
+                                                  self.Fecha[1].GetValue().Format("%Y-%m-%d"), int(idCliente[0][0]),
+                                                  float(self.Resultados[1].GetValue())))
                 connection().commit()
 
                 if self.Distribucion[1].GetStringSelection() == 'Venta':
@@ -431,15 +435,19 @@ class ComercialBillings(object):
 
                             if Producto_Disposicion[0] - int(productos[2]) > 0:
 
-                                self.parent.cursor.execute("""SELECT idFactura INTO @idFactura FROM factura 
-                                WHERE RUC = '{0}';
-                                SELECT idProductos_Compra INTO @idProductos FROM productos_compra 
-                                WHERE Nombre_Producto='{1}';
-                                INSERT INTO factura_ordinaria 
+                                self.parent.cursor.execute("""SELECT idFactura FROM factura 
+                                WHERE RUC = '{0}'""".format(RUCEmpresa))
+                                idFactura = self.parent.cursor.fetchone()
+
+                                self.parent.cursor.execute("""SELECT idProductos_Compra FROM productos_compra 
+                                WHERE Nombre_Producto='{0}'""".format(Nombre_Producto[0]))
+                                idProductos = self.parent.cursor.fetchone()
+
+                                self.parent.cursor.execute("""INSERT INTO factura_ordinaria 
                                 (Cantidad, Factura_idFactura, Compra_idProductos_Compra, Descripcion) 
-                                VALUES ('{2}', @idFactura, @idProductos, '{3}');""".
-                                                           format(RUCEmpresa, Nombre_Producto[0],
-                                                                  Producto_Disposicion[0], productos[3]), multi=True)
+                                VALUES ('{0}', '{1}', '{2}', '{3}');""".
+                                                           format(Producto_Disposicion[0],
+                                                                  idFactura[0], idProductos[0], productos[3]))
 
                                 connection().commit()
 
@@ -499,18 +507,16 @@ class ComercialBillings(object):
                                 VALUES ('{0}', '{1}', @idFactura, @lastid, '{2}')""".
                                                            format(Conteo_FacturaOrdinaria+1, producto[2], producto[3]))
                             else:
-                                self.parent.cursor.execute("""SELECT idFactura INTO @idFactura 
-                                FROM factura WHERE RUC='{0}';
-                                SELECT Cantidad INTO @Cantidad FROM productos_compra;
+                                self.parent.cursor.execute("""
                                 UPDATE productos_compra SET 
                                 idProductos_Compra='{1}', 
                                 Nombre_Producto='{2}', 
                                 Precio_Compra='{3}', 
                                 Precio_Venta='{4}', 
-                                Fecha=, {5}, 
-                                Factura_idFactura=@idFactura, 
-                                Cantidad=, {6}+@Cantidad, 
-                                Descripcion=, {7};""".format(RUCEmpresa, Filas_Productos + 1, producto[1],
+                                Fecha='{5}', 
+                                Factura_idFactura=SELECT factura.idFactura FROM factura WHERE factura.RUC='{0}', 
+                                productos_compra.Cantidad= SELECT productos_compra.Cantidad FROM productos_compra +'{6}', 
+                                productos_compra.Descripcion= {7}""".format(RUCEmpresa, Filas_Productos + 1, producto[1],
                                                              producto[4], producto[5], self.Fecha[0].GetValue(),
                                                              int(producto[2]), producto[3]))
 
