@@ -29,5 +29,6 @@ class CantidadAdicional(wx.Dialog):
 
         else:
             self.Result = int(self.text.GetValue())
+            self.Destroy()
 
 

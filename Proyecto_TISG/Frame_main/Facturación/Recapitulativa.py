@@ -3,7 +3,7 @@ import wx.lib.intctrl as intctrl
 import wx.adv
 import wx.grid as grid
 
-from Proyecto_TISG.Package import ShapedButton
+from Proyecto_TISG.Package import ShapedButton, show_messange
 from Proyecto_TISG.Variables import *
 
 
@@ -23,7 +23,8 @@ class Recapitulativa(object):
         box_Main.Add(Seleccion, 1, wx.EXPAND)
         box_Main.Add(self.box_Factura(parent), 6, wx.EXPAND)
 
-        Seleccion.Add(Facturas(self, parent), 5, wx.EXPAND)
+        self.TreeFatcuras = Facturas(self, parent)
+        Seleccion.Add(self.TreeFatcuras, 5, wx.EXPAND)
 
         self.list_Fechas = wx.CheckListBox(parent, wx.ID_ANY, choices=self.FechasFacturas, style=1)
         Seleccion.Add(self.list_Fechas, 3, wx.EXPAND)
@@ -143,6 +144,13 @@ class Recapitulativa(object):
         self.Fecha.append(date_Until)
         Box_Main.Add(date_Until, pos=(3, 7))
 
+        label_TipoPago = wx.StaticText(parent, -1, 'Tipo de pago:')
+        Box_Main.Add(label_TipoPago, pos=(4, 4), border=5)
+
+        choc_Pago = wx.Choice(parent, choices=TipoDePago)
+        choc_Pago.SetSelection(2)
+        Box_Main.Add(choc_Pago, pos=(4, 5), span=(0, 3), flag=wx.EXPAND)
+
         label_Domicilio = wx.StaticText(parent, -1, 'Domicilio:')
         Box_Main.Add(label_Domicilio, pos=(3, 8), flag=wx.EXPAND | wx.ALL, border=5)
 
@@ -163,7 +171,7 @@ class Recapitulativa(object):
         label_Serie.SetBackgroundColour('#323754')
         Box_Numeracion.Add(label_Serie, 1, wx.EXPAND)
 
-        label_Num = wx.StaticText(parent, -1, '{0}'.format(Conteo_FacturaOrdinaria + 1))
+        label_Num = wx.StaticText(parent, -1, '{0}'.format(Conteo_Recapitulativa + 1))
         label_Num.SetBackgroundColour('#323754')
         Box_Numeracion.Add(label_Num, 1, wx.EXPAND)
 
@@ -179,6 +187,7 @@ class Recapitulativa(object):
         self.ClienteInfo.append(ctrl_Nombre)  # 5
         self.ClienteInfo.append(ctrl_DNI)  # 6
         self.ClienteInfo.append(ctrl_Domicilio)  # 7
+        self.ClienteInfo.append(choc_Pago) # 8
 
         # Numeracion regla aquí: https://www.sunat.gob.pe/legislacion/superin/2017/anexosI-II-III-IV-318-2017.pdf
         # Numeracion: https://okasesores.es/facturas-emitidas-orden-numeracion-fecha-correlativas/
@@ -227,12 +236,9 @@ class Recapitulativa(object):
         Box_Main.Add(label_IGV, pos=(8, 10), span=(0, 2))
         Box_Main.Add(label_Total, pos=(9, 10), span=(0, 2))
 
-        ctrl_IGV = wx.TextCtrl(parent, -1, style=wx.TE_READONLY)
         ctrl_Total = wx.TextCtrl(parent, -1, style=wx.TE_READONLY)
-        Box_Main.Add(ctrl_IGV, pos=(8, 12), span=(0, 2), flag=wx.EXPAND)
         Box_Main.Add(ctrl_Total, pos=(9, 12), span=(0, 2), flag=wx.EXPAND | wx.ALIGN_TOP)
 
-        self.Resultados.append(ctrl_IGV)
         self.Resultados.append(ctrl_Total)
 
         label_ResumenEmpresa.SetFont(fontlabel_ResumenEmpresa)
@@ -284,6 +290,8 @@ class Recapitulativa(object):
 
         self.Producto[0].ClearGrid()
 
+        Total = []
+
         try:
             self.Producto[0].DeleteRows(numRows=self.Producto[0].GetNumberRows())
 
@@ -308,10 +316,122 @@ class Recapitulativa(object):
             self.Producto[0].SetCellValue(x, 4, DatosFactura[3])
             self.Producto[0].SetCellValue(x, 5, DatosFactura[4])
 
+            Total.append(DatosFactura[4])
+
             x = x + 1
 
+        if None in Total:
+            pass
+
+
+        self.Resultados[0].SetValue(str(sum(float(x) for x in Total)))
+
     def OnClickGuardar(self, event):
-        pass
+        RUC = []
+        total = 0
+        llenas = 0
+        vacias = 0
+        Filas = []
+        confirm = False
+        RUCs = None
+
+        RUCRecapitulativa = ("{0}{1}".format(self.ClienteInfo[3].GetLabel(), self.ClienteInfo[4].GetLabel()))
+
+        ClienteIngreso = [self.ClienteInfo[5].GetValue(), self.ClienteInfo[6].GetValue(),
+                          self.ClienteInfo[7].GetValue(), self.ClienteInfo[8].GetStringSelection(),
+                          self.Distribucion[0].GetStringSelection(), self.ClienteInfo[1].GetValue()]
+        try:
+            self.parent.cursor.execute("""SELECT RUC FROM factura WHERE Clientes_idClientes='{0}'""".
+                                       format(self.TreeFatcuras.idCliente))
+            RUCs = self.parent.cursor.fetchall()
+            RUCs = [x[0] for x in RUCs]
+
+        except AttributeError:
+            show_messange(self.parent, 'No se ha escojido un cliente')
+            pass
+
+        while total <= self.Producto[0].GetNumberRows() - 1:
+            Filas.append([])
+            RUC.append(self.Producto[0].GetCellValue(total, 1))
+
+            for x in range(6):
+                Filas[llenas].append(self.Producto[0].GetCellValue(total, x))
+
+            if len([x for x in Filas[llenas][1:3] + Filas[llenas][4:6] if x == '']) > 0:
+                RUC.pop(llenas)
+                Filas.pop(llenas)
+
+                total = total + 1
+                vacias = vacias + 1
+
+            else:
+                llenas = llenas + 1
+                total = total + 1
+
+        if llenas == total and total != 0:
+
+            self.parent.cursor.execute("SELECT COUNT(*) FROM factura")
+            idFactura = self.parent.cursor.fetchone()
+
+            try:
+                self.parent.cursor.execute("""INSERT INTO factura 
+                (idFactura, RUC, Fecha_Factura, Fecha_Limite, Concepto, Pago, Clientes_idClientes, Total) VALUES ('{0}', '{1}', '{2}'
+                , '{3}', Null, '{4}', '{5}', '{6}')""".format(idFactura[0] + 1, RUCRecapitulativa,
+                                                              self.Fecha[1].GetValue().Format("%Y-%m-%d"),
+                                                              self.Fecha[3].GetValue().Format("%Y-%m-%d"), ClienteIngreso[3],
+                                                              self.TreeFatcuras.idCliente, self.Resultados[0].GetValue()))
+
+            except AttributeError:
+                pass
+            connection().commit()
+
+        else:
+            show_messange(self.parent, "Para registrar deben haber Facturas acumuladas")
+
+        OwnFacturas = 0
+
+        for x in RUC:
+            if x in RUCs:
+                OwnFacturas = OwnFacturas + 1
+
+        if len(RUC) == OwnFacturas and RUCs:
+
+            if self.Distribucion[0].GetStringSelection() == 'Individuo':
+                Responsable = [ClienteIngreso[0]]
+
+            if self.Distribucion[0].GetStringSelection() == 'Empresa':
+                Responsable = [ClienteIngreso[0], ClienteIngreso[5]]
+
+            if len([x for x in Responsable if x == '']) == 0:
+
+                self.parent.cursor.execute("""SELECT idFactura FROM factura WHERE RUC='{0}'""".
+                                           format(str(RUCRecapitulativa)))
+                idFactura = self.parent.cursor.fetchone()
+
+                for Recapitulativas in Filas:
+                    self.parent.cursor.execute("""SELECT COUNT(*) FROM recapitulativa""")
+                    idFacturaOrdinaria = self.parent.cursor.fetchone()
+
+                    self.parent.cursor.execute("""INSERT INTO recapitulativa 
+                    (idRecapitulativa, Factura_Factura, RUC) 
+                    VALUES ('{0}', '{1}', '{2}')""".format(idFacturaOrdinaria[0] + 1, idFactura[0], Recapitulativas[1]))
+
+                    connection().commit()
+
+                    confirm = True
+
+        else:
+            show_messange(self.parent, """Las facturas instauradas no pertenecen a ese usuario, haga click en Aceptar 
+            nuevamente para actualizar""")
+
+        if confirm is True:
+
+            self.Sizers[0].ShowItems(False)
+            self.parent.GrandParent.TopUsuario.Show()
+            self.parent.SetBackgroundColour("#212F3C")
+            self.parent.SetSizerAndFit(self.parent.MenuFacturacion())
+
+            self.parent.GrandParent.Layout()
 
 
 class Facturas(wx.TreeCtrl):
@@ -324,7 +444,8 @@ class Facturas(wx.TreeCtrl):
 
         self.cover = cover
 
-        parent.cursor.execute("""SELECT NombreCliente FROM clientes""")
+        parent.cursor.execute("""SELECT NombreCliente FROM clientes WHERE idClientes > 1""")
+
         self.Clientes = sorted([x[0] for x in parent.cursor.fetchall()])
 
         root = self.AddRoot('Facturas')
@@ -340,12 +461,13 @@ class Facturas(wx.TreeCtrl):
         item = event.GetItem()
 
         if self.GetItemText(item) in self.Clientes:
-
             self.parent.cursor.execute("""SELECT idClientes, Responsable, RUC, Domicilio, DNI FROM clientes 
             WHERE NombreCliente = '{0}'""".
                                        format(self.GetItemText(item)))
             Cliente = self.parent.cursor.fetchone()
             Cliente = [str(x) for x in Cliente]
+
+            self.idCliente = Cliente[0]
 
             if Cliente[1] is None:
                 pass
@@ -396,11 +518,11 @@ class Facturas(wx.TreeCtrl):
                                        format(Cliente[0]))
             RUC = self.parent.cursor.fetchall()
 
-            RUC = [str(x[0]) for x in RUC]
+            RUC = [str(x[0]) for x in RUC if x[0][0] != 'R']
 
             for x in range(len(RUC)):
                 if RUC[x] is None:
-                    RUC[x] = 'Sin Fecha'
+                    RUC[x] = 'Sin RUC'
 
             self.cover.list_Fechas.SetItems(RUC)
 

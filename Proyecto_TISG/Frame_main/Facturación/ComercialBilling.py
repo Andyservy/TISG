@@ -4,7 +4,7 @@ import wx.grid as grid
 import wx.lib.intctrl as intctrl
 
 from Proyecto_TISG.Variables import *
-from Proyecto_TISG.data.SERVIRDOR.DATABASE import connection
+from Proyecto_TISG import connection
 from Proyecto_TISG.Package import JustInt, show_messange, ShapedButton, AutoComplete, CantidadAdicional
 
 
@@ -32,14 +32,15 @@ class ComercialBillings(object):
         self.parent.cursor.execute("""SELECT Nombre_Producto FROM productos_compra""")
         Nombres_Producto = sorted([x[0] for x in self.parent.cursor.fetchall()])
 
-        self.NombreClientes = [x[1] for x in self.Cliente if not None in x[0:3]+x[4:5]]
+        self.NombreClientes = [x[1] for x in self.Cliente if not None in x[0:3] + x[4:5]]
 
         label_ResumenEmpresa = wx.StaticText(parent, -1, str(Consult_DataEmpresa[4]))
         Box_Main.Add(label_ResumenEmpresa, pos=(0, 0), span=(0, 10),
                      flag=wx.ALIGN_CENTER | wx.ALL, border=5)
         fontlabel_ResumenEmpresa = wx.Font(16, wx.ROMAN, wx.NORMAL, wx.NORMAL)
 
-        label_Ubicacion = wx.StaticText(parent, -1, "{0} Telefono: {1}".format(str(Consult_DataEmpresa[2]), Consult_DataEmpresa[7]))
+        label_Ubicacion = wx.StaticText(parent, -1,
+                                        "{0} Telefono: {1}".format(str(Consult_DataEmpresa[2]), Consult_DataEmpresa[7]))
         Box_Main.Add(label_Ubicacion, pos=(1, 1), span=(0, 9),
                      flag=wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.ALL)
 
@@ -152,7 +153,7 @@ class ComercialBillings(object):
         label_Serie.SetBackgroundColour('#323754')
         Box_Numeracion.Add(label_Serie, 1, wx.EXPAND)
 
-        label_Num = wx.StaticText(parent, -1, '{0}'.format(Conteo_FacturaOrdinaria + 1))
+        label_Num = wx.StaticText(parent, -1, '{0}'.format(Conteo_FacturaVenta + 1))
         label_Num.SetBackgroundColour('#323754')
         Box_Numeracion.Add(label_Num, 1, wx.EXPAND)
 
@@ -211,7 +212,7 @@ class ComercialBillings(object):
 
         ChoiceProducto = grid.GridCellChoiceEditor(Nombres_Producto, True)
 
-        for x in range(Tabla_Articulos.GetNumberRows()-1):
+        for x in range(Tabla_Articulos.GetNumberRows() - 1):
             Tabla_Articulos.SetCellEditor(x, 1, ChoiceProducto)
 
         Tabla_Articulos.DisableDragColSize()
@@ -223,7 +224,6 @@ class ComercialBillings(object):
             _ = _ - 1
             Tabla_Articulos.SetCellValue(_, 0, "{0}".format(_ + 1))
             Tabla_Articulos.SetCellValue(_, 6, "{0}%".format(str(IGV)))
-
 
         self.Producto.append(Tabla_Articulos)
         Tabla_Articulos.ForceRefresh()
@@ -251,7 +251,8 @@ class ComercialBillings(object):
         self.Resultados.append(ctrl_Total)
 
         if home is True:
-            btn_Regresar = ShapedButton(parent, wx.Bitmap(Icon_Home[0]), wx.Bitmap(Icon_Home[1]), wx.Bitmap(Icon_Home[0]))
+            btn_Regresar = ShapedButton(parent, wx.Bitmap(Icon_Home[0]), wx.Bitmap(Icon_Home[1]),
+                                        wx.Bitmap(Icon_Home[0]))
             Box_Main.Add(btn_Regresar, pos=(7, 0), span=(3, 0))
             btn_Regresar.Bind(wx.EVT_BUTTON, self.OnClickRegresar)
 
@@ -280,6 +281,7 @@ class ComercialBillings(object):
         if self.Distribucion[0].GetStringSelection() == ResponsableCompraVenta[1]:
             self.ClienteInfo[0].Hide()
             self.ClienteInfo[1].Hide()
+            self.ClienteInfo[1].Clear()
 
             self.Fecha[0].Hide()
             self.Fecha[1].Hide()
@@ -291,6 +293,7 @@ class ComercialBillings(object):
         if self.Distribucion[0].GetStringSelection() == ResponsableCompraVenta[0]:
             self.ClienteInfo[0].Show()
             self.ClienteInfo[1].Show()
+            self.ClienteInfo[1].Clear()
 
             self.Fecha[0].Show()
             self.Fecha[1].Show()
@@ -303,12 +306,14 @@ class ComercialBillings(object):
         if self.Distribucion[1].GetStringSelection() == 'Venta':
             self.Producto[0].HideCol(5)
             self.ClienteInfo[4].SetLabelText(Serie[0])
+            self.ClienteInfo[5].SetLabelText(str(Conteo_FacturaVenta+1))
 
             self.attr.SetReadOnly(True)
 
         if self.Distribucion[1].GetStringSelection() == 'Compra':
             self.Producto[0].ShowCol(5)
             self.ClienteInfo[4].SetLabelText(Serie[1])
+            self.ClienteInfo[5].SetLabelText(str(Conteo_FacturaCompra + 1))
 
             self.attr.SetReadOnly(False)
 
@@ -329,7 +334,7 @@ class ComercialBillings(object):
         _ = self.Producto[0].GetNumberRows()
 
         self.Producto[0].SetCellValue(_ - 1, 0, "{0}".format(_))
-        self.Producto[0].SetCellValue(_-1, 6, "{0}%".format(str(IGV[0])))
+        self.Producto[0].SetCellValue(_ - 1, 6, "{0}%".format(str(IGV[0])))
         self.Producto[0].SetFocus()
 
     def OnClickQuitar(self, event):
@@ -347,7 +352,7 @@ class ComercialBillings(object):
         Confirm = False
         RUCEmpresa = ("{0}{1}".format(self.ClienteInfo[4].GetLabel(), self.ClienteInfo[5].GetLabel()))
 
-        ClienteIngreso = [self.ClienteInfo[6].GetValue(), self.ClienteInfo[7].GetValue(),
+        ClienteIngreso = [self.ClienteInfo[6].GetValue(), str(self.ClienteInfo[7].GetValue()),
                           self.ClienteInfo[8].GetValue(), self.Distribucion[0].GetStringSelection(),
                           self.ClienteInfo[1].GetValue()]
 
@@ -357,7 +362,7 @@ class ComercialBillings(object):
             for _ in range(8):
                 Filas[llenas].append(self.Producto[0].GetCellValue(total, _))
 
-            if len([x for x in Filas[llenas][1:3] + Filas[4:5] + Filas[llenas][7:8] if x =='']) > 0:
+            if len([x for x in Filas[llenas][1:3] + Filas[4:5] + Filas[llenas][7:8] if x == '']) > 0:
                 Filas.pop(llenas)
 
                 total = total + 1
@@ -373,34 +378,45 @@ class ComercialBillings(object):
                 Responsable = [ClienteIngreso[0]]
 
             if ClienteIngreso[3] == 'Empresa':
+                if ClienteIngreso[4] == '0':
+                    ClienteIngreso[4] = ''
+
                 Responsable = [ClienteIngreso[0], ClienteIngreso[4]]
 
-            if len([x for x in Responsable if x =='']) == 0:
+            if len([x for x in Responsable if x == '']) == 0:
 
                 if not ClienteIngreso[0] in self.NombreClientes:
-                    self.parent.cursor.execute("""INSERT INTO Clientes (
+
+                    self.parent.cursor.execute(
+                        """SELECT idClientes FROM clientes WHERE NombreCliente='{0}'""".format(Responsable[0]))
+                    idClienteInsert = self.parent.cursor.fetchall()
+
+                    self.parent.cursor.execute("""INSERT INTO Clientes (idClientes,
                              NombreCliente, DNI, Domicilio, Responsable, RUC)
                              VALUES
-                             ('{0}', '{1}', '{2}', '{3}', '{4}')""".format(ClienteIngreso[0],
-                                                                           ClienteIngreso[1],
-                                                                           ClienteIngreso[2],
-                                                                           ClienteIngreso[3],
-                                                                           ClienteIngreso[4]))
+                             ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')""".format(idClienteInsert[0][0] + 1,
+                                                                                  ClienteIngreso[0],
+                                                                                  ClienteIngreso[1],
+                                                                                  ClienteIngreso[2],
+                                                                                  ClienteIngreso[3],
+                                                                                  ClienteIngreso[4]))
                     connection().commit()
 
                 else:
+                    self.parent.cursor.execute(
+                        """SELECT idClientes FROM clientes WHERE NombreCliente='{0}'""".format(Responsable[0]))
+                    idClienteUpdate = self.parent.cursor.fetchall()
                     self.parent.cursor.execute("""UPDATE clientes SET
-                             NombreCliente = '{0}',
-                             DNI = '{1}',
-                             Domicilio = '{2}',
-                             Responsable = '{3}',
-                             RUC = '{4}' 
-                             WHERE NombreCliente = '{0}'
-                             """.format(ClienteIngreso[0], ClienteIngreso[1], ClienteIngreso[2], ClienteIngreso[3],
-                                        ClienteIngreso[4]))
+                             DNI = '{0}',
+                             Domicilio = '{1}',
+                             Responsable = '{2}',
+                             RUC = '{3}' WHERE 
+                             idClientes = '{4}';""".format(ClienteIngreso[1], ClienteIngreso[2], ClienteIngreso[3],
+                                                           ClienteIngreso[4], idClienteUpdate[0][0]))
                     connection().commit()
 
-                self.parent.cursor.execute("""SELECT idClientes FROM clientes WHERE NombreCliente='{0}'""".format(Responsable[0]))
+                self.parent.cursor.execute(
+                    """SELECT idClientes FROM clientes WHERE NombreCliente='{0}'""".format(Responsable[0]))
                 idCliente = self.parent.cursor.fetchall()
 
                 self.parent.cursor.execute("""SELECT COUNT(*) FROM factura""")
@@ -410,7 +426,7 @@ class ComercialBillings(object):
                     INSERT INTO factura (idFactura, RUC, Fecha_Limite, Pago, Concepto, Fecha_Factura, 
                     Clientes_idClientes, Total) 
                     VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');""".
-                                           format(int(numFacturas[0][0])+1, RUCEmpresa,
+                                           format(int(numFacturas[0][0]) + 1, RUCEmpresa,
                                                   self.Fecha[1].GetValue().Format("%Y-%m-%d"),
                                                   self.ClienteInfo[9].GetStringSelection(),
                                                   self.Distribucion[1].GetStringSelection(),
@@ -443,34 +459,47 @@ class ComercialBillings(object):
                                 WHERE Nombre_Producto='{0}'""".format(Nombre_Producto[0]))
                                 idProductos = self.parent.cursor.fetchone()
 
+                                self.parent.cursor.execute("""SELECT COUNT(*) FROM factura_ordinaria""")
+                                idFacturaOrdinaria = self.parent.cursor.fetchone()
+
                                 self.parent.cursor.execute("""INSERT INTO factura_ordinaria 
-                                (Cantidad, Factura_idFactura, Compra_idProductos_Compra, Descripcion) 
-                                VALUES ('{0}', '{1}', '{2}', '{3}');""".
-                                                           format(Producto_Disposicion[0],
+                                (idFactura_Ordinaria, Cantidad, Factura_idFactura, Compra_idProductos_Compra, 
+                                Descripcion) 
+                                VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')""".
+                                                           format(idFacturaOrdinaria[0] + 1, Producto_Disposicion[0],
                                                                   idFactura[0], idProductos[0], productos[3]))
 
                                 connection().commit()
+
+                                Confirm = True
+
 
                             else:
                                 show_messange(self.parent,
                                               "El producto '{0}' esta agotado o el pedido excede su cantidad actual de: "
                                               "'{1}'".format(productos[1], Producto_Disposicion))
 
-                                Respuesta = wx.MessageDialog(self.parent, '¿Desea actualizar la disposicion del producto?',
-                                                 'Dispocision',
-                                                 wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION).ShowModal()
+                                Respuesta = wx.MessageDialog(self.parent,
+                                                             '¿Desea actualizar la disposicion del producto?',
+                                                             'Dispocision',
+                                                             wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION).ShowModal()
 
                                 if Respuesta == wx.ID_YES:
 
-                                    Respuesta.Destroy()
-                                    Actualizar = CantidadAdicional(self.parent).ShowModal()
+                                    Actualizar = CantidadAdicional(self.parent)
+                                    Actualizar.ShowModal()
                                     CantidadAgregar = Actualizar.Result
 
-                                    self.parent.cursor.execute("""INSERT INTO productos_compra (Cantidad) 
-                                    VALUE ('{0}')""".format(CantidadAgregar))
+                                    self.parent.cursor.execute("""UPDATE productos_compra SET Cantidad = '{0}' 
+                                    WHERE Nombre_Producto = '{1}'""".format(CantidadAgregar, Nombre_Producto[0]))
+
+                                    self.parent.cursor.execute("""DELETE FROM factura WHERE RUC = '{0}'""".
+                                                               format(RUCEmpresa))
+
+                                    connection().commit()
 
                                 elif Respuesta == wx.ID_NO:
-                                    Respuesta.Destroy()
+                                    pass
 
                         else:
                             show_messange(self.parent,
@@ -479,7 +508,7 @@ class ComercialBillings(object):
                 else:
                     if len([x[5] for x in Filas if x[5]]) > 0:
                         cursor.execute("SELECT COUNT(*) FROM productos_compra")
-                        Filas_Productos = cursor.fetchone()[0]
+                        Filas_Productos = cursor.fetchone()
 
                         for producto in Filas:
                             self.parent.cursor.execute("""SELECT Nombre_Producto FROM productos_compra 
@@ -487,49 +516,92 @@ class ComercialBillings(object):
 
                             Nombre_Producto = self.parent.cursor.fetchone()
 
-                            if Nombre_Producto == '':
-                                self.parent.cursor.execute("""SELECT idFactura INTO @idFactura FROM factura 
-                                WHERE RUC='{0}';
-                                INSERT INTO productos_compra (idProductos_Compra, Nombre_Producto, Precio_Compra, 
-                                Precio_Venta, Fecha, Factura_idFactura, Cantidad, Descripcion) 
-                                VALUES ('{1}', '{2}', '{3}', '{4}', {5}, @idFactura, {6}, {7}})""".
-                                                       format(RUCEmpresa, Filas_Productos + 1, producto[1],
-                                                              producto[4], producto[5], self.Fecha[0].GetValue(),
-                                                              producto[2], producto[3]))
+                            if Nombre_Producto is None:
+                                Nombre_Producto = ['']
+
+                            if Nombre_Producto[0] == '':
+
+                                self.parent.cursor.execute("""SELECT idFactura FROM factura 
+                                WHERE RUC = '{0}'""".format(RUCEmpresa))
+                                idFactura = self.parent.cursor.fetchone()
+
+                                self.parent.cursor.execute("""INSERT INTO productos_compra 
+                                (idProductos_Compra, Nombre_Producto, Precio_Compra, Precio_Venta, Fecha, 
+                                Factura_idFactura, Cantidad, Descripcion) VALUES ('{0}', '{1}', '{2}', '{3}', 
+                                '{4}', '{5}', '{6}', '{7}')""".format(int(Filas_Productos[0]) + 1, producto[1],
+                                                                      int(producto[4]), int(producto[5]),
+                                                                      self.Fecha[1].GetValue().Format("%Y-%m-%d"),
+                                                                      idFactura[0], int(producto[2]), producto[3]))
+
                                 connection().commit()
 
-                                self.parent.cursor.execute("""SELECT idProductos_Compra INTO @lastid 
-                                FROM productos_compra ORDER BY idProductos_Compra DESC LIMIT 1;
-                                SELECT Factura_idFactura INTO @idFactura FROM productos_compra 
-                                WHERE idProductos_Compra = @lastid;
-                                INSERT INTO factura_ordinaria (IDFACTURA_ORDINARIA,
-                                CANTIDAD, FACTURA_IDFACTURA, COMPRA_IDPRODUCTOS_COMPRA, DESCRIPCION) 
-                                VALUES ('{0}', '{1}', @idFactura, @lastid, '{2}')""".
-                                                           format(Conteo_FacturaOrdinaria+1, producto[2], producto[3]))
+                                self.parent.cursor.execute("""SELECT idProductos_Compra FROM productos_compra 
+                                ORDER BY idProductos_Compra DESC LIMIT 1""")
+                                lastid = self.parent.cursor.fetchone()
+
+                                self.parent.cursor.execute("""SELECT Factura_idFactura FROM productos_compra 
+                                WHERE idProductos_Compra = '{0}'""".format(lastid[0]))
+                                idFactura = self.parent.cursor.fetchone()
+
+                                try:
+                                    self.parent.cursor.execute("""INSERT INTO factura_ordinaria (IDFACTURA_ORDINARIA,
+                                    CANTIDAD, FACTURA_IDFACTURA, COMPRA_IDPRODUCTOS_COMPRA, DESCRIPCION) 
+                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')""".
+                                                               format(Conteo_FacturaOrdinaria + 1, producto[2],
+                                                                      idFactura[0],
+                                                                      lastid[0], producto[3]))
+
+
+                                except:
+                                    pass
                             else:
-                                self.parent.cursor.execute("""
-                                UPDATE productos_compra SET 
-                                idProductos_Compra='{1}', 
-                                Nombre_Producto='{2}', 
-                                Precio_Compra='{3}', 
-                                Precio_Venta='{4}', 
-                                Fecha='{5}', 
-                                Factura_idFactura=SELECT factura.idFactura FROM factura WHERE factura.RUC='{0}', 
-                                productos_compra.Cantidad= SELECT productos_compra.Cantidad FROM productos_compra +'{6}', 
-                                productos_compra.Descripcion= {7}""".format(RUCEmpresa, Filas_Productos + 1, producto[1],
-                                                             producto[4], producto[5], self.Fecha[0].GetValue(),
-                                                             int(producto[2]), producto[3]))
+
+                                self.parent.cursor.execute("""SELECT idFactura FROM factura 
+                                WHERE factura.RUC='{0}'""".format(RUCEmpresa))
+                                idFactura = self.parent.cursor.fetchone()
+
+                                self.parent.cursor.execute("""SELECT Cantidad FROM productos_compra 
+                                WHERE Nombre_Producto='{0}'""".format(Nombre_Producto[0]))
+                                CantidadProducto = self.parent.cursor.fetchone()
+
+                                try:
+                                    self.parent.cursor.execute("""
+                                    UPDATE productos_compra SET 
+                                    idProductos_Compra='{0}', 
+                                    Nombre_Producto='{1}', 
+                                    Precio_Compra='{2}', 
+                                    Precio_Venta='{3}', 
+                                    Fecha='{4}', 
+                                    Factura_idFactura= '{5}', 
+                                    Cantidad= '{6}' + '{7}', 
+                                    Descripcion= {8} WHERE Nombre_Producto='{1}'""".format(Filas_Productos[0] + 1, producto[1],
+                                                                                           producto[4], producto[5],
+                                                                                           self.Fecha[1].GetValue().
+                                                                                           Format("%Y-%m-%d"),
+                                                                                           idFactura[0],
+                                                                                           int(CantidadProducto[0]),
+                                                                                           int(producto[2]), producto[3]))
+
+                                except:
+                                    pass
 
                                 connection().commit()
 
-                                self.parent.cursor.execute("""SELECT idProductos_Compra INTO @lastid 
-                                FROM productos_compra ORDER BY idProductos_Compra DESC LIMIT 1;
-                                SELECT Factura_idFactura INTO @idFactura FROM productos_compra 
-                                WHERE idProductos_Compra = @lastid;
-                                INSERT INTO factura_ordinaria (IDFACTURA_ORDINARIA,
+                                self.parent.cursor.execute("""SELECT idProductos_Compra FROM productos_compra 
+                                ORDER BY idProductos_Compra DESC LIMIT 1""")
+                                lastid = self.parent.cursor.fetchone()
+
+                                self.parent.cursor.execute("""SELECT Factura_idFactura FROM productos_compra 
+                                WHERE idProductos_Compra = '{0}'""".format(lastid[0]))
+                                idFactura = self.parent.cursor.fetchone()
+
+                                self.parent.cursor.execute("""INSERT INTO factura_ordinaria (IDFACTURA_ORDINARIA,
                                 CANTIDAD, FACTURA_IDFACTURA, COMPRA_IDPRODUCTOS_COMPRA, DESCRIPCION) 
-                                VALUES ('{0}', '{1}', @idFactura, @lastid, '{2}')""".
-                                                           format(Conteo_FacturaOrdinaria+1, producto[2], producto[3]))
+                                VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')""".
+                                                           format(Conteo_FacturaOrdinaria[0] + 1, producto[2],
+                                                                  idFactura[0], lastid[0], producto[3]))
+
+                            Confirm = True
 
                     else:
                         show_messange(self.parent,
@@ -544,6 +616,14 @@ class ComercialBillings(object):
             show_messange(self.parent, "Para registrar deben haber pedidos")
 
         connection().commit()
+
+        if Confirm is True:
+            self.Sizers[0].ShowItems(False)
+            self.parent.GrandParent.TopUsuario.Show()
+            self.parent.SetBackgroundColour("#212F3C")
+            self.parent.SetSizerAndFit(self.parent.MenuFacturacion())
+
+            self.parent.GrandParent.Layout()
 
     def OnFillNombre(self, event):
 
@@ -564,7 +644,7 @@ class ComercialBillings(object):
     def OnEditCell(self, event):
         SetPrecio = []
         SubTotalAll = []
-        for x in range(self.Producto[0].GetNumberRows()-1):
+        for x in range(self.Producto[0].GetNumberRows() - 1):
             SetPrecio.append(self.Producto[0].GetCellValue(x, 1))
 
             if self.Distribucion[1].GetStringSelection() == 'Venta':
@@ -574,12 +654,34 @@ class ComercialBillings(object):
                     WHERE Nombre_Producto = '{0}'""".format(SetPrecio[x]))
                     Precio = self.parent.cursor.fetchone()
 
+                    if Precio is None:
+                        Precio = ('Sin Precio',)
+
                     self.Producto[0].SetCellValue((x, 4), str(Precio[0]))
 
-                    if self.Producto[0].GetCellValue(x, 2) != '':
-                        SubTotal = int(Precio[0])*int(self.Producto[0].GetCellValue(x, 2))+(int(Precio[0])*IGV/100)
+                    if self.Producto[0].GetCellValue(x, 2) != '' and Precio[0] is not None and Precio[0] != 'Sin Precio':
+                        SubTotal = int(Precio[0]) * int(self.Producto[0].GetCellValue(x, 2)) + (
+                                    int(Precio[0]) * IGV / 100)
                         self.Producto[0].SetCellValue((x, 7), str(SubTotal))
+                        self.Producto[0].SetCellValue((x, 4), str(Precio[0]))
                         SubTotalAll.append(SubTotal)
+
+            if self.Distribucion[1].GetStringSelection() == 'Compra':
+
+                Precio = self.Producto[0].GetCellValue(x, 4)
+
+                try:
+                    int(Precio)
+
+                except ValueError:
+                    Precio = 0
+
+                if self.Producto[0].GetCellValue(x, 2) != '':
+                    SubTotal = int(Precio) * int(self.Producto[0].GetCellValue(x, 2)) + \
+                               (int(Precio) * IGV / 100)
+                    self.Producto[0].SetCellValue((x, 7), str(SubTotal))
+                    self.Producto[0].SetCellValue((x, 4), str(Precio))
+                    SubTotalAll.append(SubTotal)
 
         self.Resultados[0].SetValue(str(IGV))
         self.Resultados[1].SetValue(str(sum(SubTotalAll)))

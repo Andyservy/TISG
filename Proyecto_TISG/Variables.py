@@ -1,27 +1,28 @@
-from Proyecto_TISG.data.SERVIRDOR.DATABASE import connection
+# #cuando poner fetchone soloe scoje el primero, pero aune sta el lista, eso generara error si no corrijes en ComercialBilling
+from Proyecto_TISG import connection
+import os
 
 cursor = connection().cursor()
-Icon_Home = ['C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Home.png',
-             'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Home_click.png']
+
+Icon_Home = [os.path.abspath('Home.png'),
+             os.path.abspath('Home_click.png')]
 Color = "#212F3C"
 
-Preview_Billing = ['C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Factura ordinaria.png',
-                   'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Factura resumen.png',
-                   'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Pagaré.png',
-                   'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Less focus.png']
+Preview_Billing = [os.path.abspath('Factura ordinaria.png'),
+                   os.path.abspath('Factura resumen.png'),
+                   os.path.abspath('Pagaré.png'),
+                   os.path.abspath('Less focus.png')]
 
-Productos_Pres = ['C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Tubos pvc.png',
-                  'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Pacasmayo.png',
-                  'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Fierros.png']
+Productos_Pres = [os.path.abspath('Tubos pvc.png'),
+                  os.path.abspath('Pacasmayo.png'),
+                  os.path.abspath('Fierros.png')]
 
-Buscador = ['C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Buscar.png',
-            'C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Buscar_Click.png']
+Buscador = [os.path.abspath('Buscar.png'),
+            os.path.abspath('Buscar_Click.png')]
 
-Agregar = ['C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Agregar.png', 'C:/Users/USUARIO/Desktop/TISG'
-                                                                           '/Proyecto_TISG/data/Agregar_Out.png']
+Agregar = [os.path.abspath('Agregar.png'), os.path.abspath('Agregar_Out.png')]
 
-Quitar = ['C:/Users/USUARIO/Desktop/TISG/Proyecto_TISG/data/Quitar.png', 'C:/Users/USUARIO/Desktop/TISG'
-                                                                          '/Proyecto_TISG/data/Quitar_Out.png']
+Quitar = [os.path.abspath('Quitar.png'), os.path.abspath('Quitar_Out.png')]
 
 list_DatosEmpresa = ['RazonSocial', 'DireccionMatriz', 'RUC', 'Resumen', 'IGV', 'TipoEmpresa', 'Telefono']
 
@@ -32,18 +33,31 @@ TipoDePago = ['Cheque', 'Transferencia', 'Contado']
 Comprobante = ['Boleta de venta', 'Factura']
 Serie = ['F-', 'B-', 'R-']
 
-cursor.execute("SELECT * FROM DataEmpresa")
-Consult_DataEmpresa = cursor.fetchone()
+cursor.execute("SELECT * FROM dataempresa")
+Consult_DataEmpresa = cursor.fetchall()
+Consult_DataEmpresa = Consult_DataEmpresa[0]
 
 cursor.execute("SELECT COUNT(*) FROM factura_ordinaria")
-Conteo_FacturaOrdinaria = cursor.fetchone()[0]
+Conteo_FacturaOrdinaria = cursor.fetchone()
+Conteo_FacturaOrdinaria = Conteo_FacturaOrdinaria[0]
 
 cursor.execute("SELECT COUNT(*) FROM factura")
-Conteo_Factura = cursor.fetchone()[0]
-#cuando poner fetchone soloe scoje el primero, pero aune sta el lista, eso generara error si no corrijes en ComercialBilling
+Conteo_Factura = cursor.fetchone()
+Conteo_Factura = Conteo_Factura[0]
+
+cursor.execute("SELECT COUNT(*) FROM factura WHERE Concepto='Venta'")
+Conteo_FacturaVenta = cursor.fetchone()
+Conteo_FacturaVenta = Conteo_FacturaVenta[0]
+
+cursor.execute("SELECT COUNT(*) FROM factura WHERE Concepto='Compra'")
+Conteo_FacturaCompra = cursor.fetchone()
+Conteo_FacturaCompra = Conteo_FacturaCompra[0]
 
 cursor.execute("SELECT IGV FROM dataempresa")
-IGV = cursor.fetchone()[0]
+IGV = cursor.fetchone()
+IGV = IGV[0]
 
-cursor.execute("SELECT COUNT(*) FROM recapitulativa")
-Conteo_Recapitulativa = cursor.fetchone()[0]
+cursor.execute("SELECT * FROM factura")
+Conteo_Recapitulativa = cursor.fetchall()
+Conteo_Recapitulativa = len([x[1] for x in Conteo_Recapitulativa if x[1][0] == 'R'])
+

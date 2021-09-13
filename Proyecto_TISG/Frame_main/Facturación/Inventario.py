@@ -1,11 +1,10 @@
 import wx
 import wx.grid as grid
-import time
 
 from Proyecto_TISG.Variables import *
 from Proyecto_TISG.Package import ShapedButton, Btnbicolor, show_messange
 from Proyecto_TISG.Package.Formulary import Verificacion
-from Proyecto_TISG.data.SERVIRDOR.DATABASE import connection
+from Proyecto_TISG import connection
 
 
 class Inventario(object):
@@ -105,16 +104,21 @@ class Inventario(object):
     def Actualizar(self):
 
         self.parent.cursor.execute("""SELECT 
-        productos_compra.IDPRODUCTOS_COMPRA, 
-        productos_compra.NOMBRE_PRODUCTO,
-        productos_compra.PRECIO_COMPRA,
-        productos_compra.PRECIO_VENTA,
-        DATE_FORMAT(productos_compra.Fecha, '%Y-%d-%m'),
-        factura.RUC,
-        productos_compra.CANTIDAD,       
-        productos_compra.DESCRIPCION
-        FROM productos_compra, factura """)
+        productos_compra.idProductos_Compra,
+        productos_compra.Nombre_Producto,
+        productos_compra.Precio_Compra,
+        productos_compra.Precio_Venta,
+        productos_compra.Fecha,
+       (SELECT factura.RUC FROM factura, productos_compra WHERE factura.idFactura = productos_compra.Factura_idFactura),
+       productos_compra.Cantidad,
+       productos_compra.Descripcion
+        FROM factura, productos_compra 
+        WHERE factura.idFactura = productos_compra.Factura_idFactura""")
+
         self.ProductoTable = self.parent.cursor.fetchall()
+
+        if not self.ProductoTable:
+            self.ProductoTable.append([])
 
         for x in range(self.Producto[0].GetNumberRows()):
             term = False
@@ -175,7 +179,8 @@ class Inventario(object):
                         != '':
 
                     cursor.execute("SELECT COUNT(*) FROM productos_compra")
-                    Filas_Productos = cursor.fetchone()[0]
+                    Filas_Productos = cursor.fetchone()
+                    Filas_Productos = Filas_Productos[0]
 
                     for e in self.ProductoTable:
                         ProductosTable = [str(r) for r in e]
@@ -184,7 +189,8 @@ class Inventario(object):
                             break
 
                         elif int(Filas[y][0]) <= Filas_Productos:
-                            self.parent.cursor.execute("""UPDATE productos_compra 
+                            cursor2 = connection().cursor()
+                            cursor2.execute("""UPDATE productos_compra 
                             SET Nombre_Producto = '{0}',
                             Precio_Compra = '{1}',
                             Precio_Venta = '{2}',
@@ -197,15 +203,13 @@ class Inventario(object):
 
                         else:
                             self.parent.cursor.execute("""INSERT INTO productos_compra (IDPRODUCTOS_COMPRA, NOMBRE_PRODUCTO, 
-                            PRECIO_COMPRA, PRECIO_VENTA,  FECHA,FACTURA_IDFACTURA, CANTIDAD, DESCRIPCION) VALUES ('{0}', '{1}', 
+                            PRECIO_COMPRA, PRECIO_VENTA, FECHA, FACTURA_IDFACTURA, CANTIDAD, DESCRIPCION) VALUES ('{0}', '{1}', 
                             '{2}', '{3}' , '{4}', '{5}', '{6}', '{7}')""".format(Filas_Productos+1, Filas[y][1], Filas[y][2],
                                                                                  Filas[y][3], Filas[y][4], 1, Filas[y][6],
                                                                                  Filas[y][7]))
                             Filas_Productos = Filas_Productos + 1
 
                             break
-
-
 
                     connection().commit()
 

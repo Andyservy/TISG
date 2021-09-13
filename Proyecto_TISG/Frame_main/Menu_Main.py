@@ -5,6 +5,7 @@ from Proyecto_TISG.Package import Btnbicolor, PhotoCtrl
 
 # Scripts
 from Proyecto_TISG.Frame_main.Facturación import DataFacturacion, ComercialBillings, Inventario, Recapitulativa
+from Proyecto_TISG.Frame_main.Buscador import Search
 from Proyecto_TISG.Frame_main import MenuTab
 from Proyecto_TISG.Package import ShapedButton
 
@@ -51,6 +52,9 @@ class Facturacion(wx.Panel, MenuTab):
         Box_Preview.Add(self.bmp_Focusless, 3, wx.EXPAND | wx.ALL, 15)
         PhotoCtrl(self, Preview_Billing[3], self.bmp_Focusless)
 
+        anabel = wx.StaticText(self, -1, 'Anabel')
+        Box_Preview.Add(anabel, 1, wx.ALL, 2)
+
         BTN = [Btn_CommercialBilling, Btn_SumUpBilling, Btn_Descripcion, Btn_Inventario]
         Btnbicolor(BTN, '#2C4158', '#384A5F')
 
@@ -70,6 +74,7 @@ class Facturacion(wx.Panel, MenuTab):
         Btn_Descripcion.Bind(wx.EVT_BUTTON, self.OnClickD)
         Btn_Inventario.Bind(wx.EVT_BUTTON, self.OnClickInventario)
         Btn_SumUpBilling.Bind(wx.EVT_BUTTON, self.OnClickSMB)
+        Btn_Buscar.Bind(wx.EVT_BUTTON, self.OnClickSearch)
 
         return self.Box_Main
 
@@ -124,6 +129,18 @@ class Facturacion(wx.Panel, MenuTab):
         self.SetSizerAndFit(Inventario().Box(self))
 
         self.GrandParent.Layout()
+
+    def OnClickSearch(self, event):
+        self.GrandParent.TopUsuario.Hide()
+        self.Box_Main.ShowItems(show=False)
+
+        self.FacturaRec = Search()
+        self.SetBackgroundColour('#7786DE')
+
+        self.SetSizerAndFit(self.FacturaRec.Box(self))
+
+        self.GrandParent.Layout()
+
 
 
 # Referencia

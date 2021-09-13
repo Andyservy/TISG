@@ -1,0 +1,1 @@
+from .Buscador import Search
