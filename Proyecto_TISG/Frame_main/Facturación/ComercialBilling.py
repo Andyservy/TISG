@@ -350,6 +350,7 @@ class ComercialBillings(object):
         llenas = 0
         vacias = 0
         Confirm = False
+        again = False
         RUCEmpresa = ("{0}{1}".format(self.ClienteInfo[4].GetLabel(), self.ClienteInfo[5].GetLabel()))
 
         ClienteIngreso = [self.ClienteInfo[6].GetValue(), str(self.ClienteInfo[7].GetValue()),
@@ -387,8 +388,7 @@ class ComercialBillings(object):
 
                 if not ClienteIngreso[0] in self.NombreClientes:
 
-                    self.parent.cursor.execute(
-                        """SELECT idClientes FROM clientes WHERE NombreCliente='{0}'""".format(Responsable[0]))
+                    self.parent.cursor.execute("""SELECT COUNT(*) FROM clientes""")
                     idClienteInsert = self.parent.cursor.fetchall()
 
                     self.parent.cursor.execute("""INSERT INTO Clientes (idClientes,
@@ -422,16 +422,18 @@ class ComercialBillings(object):
                 self.parent.cursor.execute("""SELECT COUNT(*) FROM factura""")
                 numFacturas = self.parent.cursor.fetchall()
 
-                self.parent.cursor.execute("""
-                    INSERT INTO factura (idFactura, RUC, Fecha_Limite, Pago, Concepto, Fecha_Factura, 
-                    Clientes_idClientes, Total) 
-                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');""".
-                                           format(int(numFacturas[0][0]) + 1, RUCEmpresa,
-                                                  self.Fecha[1].GetValue().Format("%Y-%m-%d"),
-                                                  self.ClienteInfo[9].GetStringSelection(),
-                                                  self.Distribucion[1].GetStringSelection(),
-                                                  self.Fecha[1].GetValue().Format("%Y-%m-%d"), int(idCliente[0][0]),
-                                                  float(self.Resultados[1].GetValue())))
+                if again is False:
+
+                    self.parent.cursor.execute("""
+                        INSERT INTO factura (idFactura, RUC, Fecha_Limite, Pago, Concepto, Fecha_Factura, 
+                        Clientes_idClientes, Total) 
+                        VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');""".
+                                               format(int(numFacturas[0][0]) + 1, RUCEmpresa,
+                                                      self.Fecha[1].GetValue().Format("%Y-%m-%d"),
+                                                      self.ClienteInfo[9].GetStringSelection(),
+                                                      self.Distribucion[1].GetStringSelection(),
+                                                      self.Fecha[1].GetValue().Format("%Y-%m-%d"), int(idCliente[0][0]),
+                                                      float(self.Resultados[1].GetValue())))
                 connection().commit()
 
                 if self.Distribucion[1].GetStringSelection() == 'Venta':
@@ -466,14 +468,17 @@ class ComercialBillings(object):
                                 (idFactura_Ordinaria, Cantidad, Factura_idFactura, Compra_idProductos_Compra, 
                                 Descripcion) 
                                 VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')""".
-                                                           format(idFacturaOrdinaria[0] + 1, Producto_Disposicion[0],
+                                                           format(idFacturaOrdinaria[0] + 1, int(productos[2]),
                                                                   idFactura[0], idProductos[0], productos[3]))
+
+                                self.parent.cursor.execute("""UPDATE productos_compra SET Cantidad = '{0}' 
+                                WHERE idProductos_Compra='{1}'""".
+                                                           format(Producto_Disposicion[0] - int(productos[2]),
+                                                                  idProductos[0]))
 
                                 connection().commit()
 
                                 Confirm = True
-
-
                             else:
                                 show_messange(self.parent,
                                               "El producto '{0}' esta agotado o el pedido excede su cantidad actual de: "
@@ -493,12 +498,43 @@ class ComercialBillings(object):
                                     self.parent.cursor.execute("""UPDATE productos_compra SET Cantidad = '{0}' 
                                     WHERE Nombre_Producto = '{1}'""".format(CantidadAgregar, Nombre_Producto[0]))
 
-                                    self.parent.cursor.execute("""DELETE FROM factura WHERE RUC = '{0}'""".
-                                                               format(RUCEmpresa))
+                                    connection().commit()
+
+                                    self.parent.cursor.execute("""SELECT idFactura FROM factura 
+                                                                    WHERE RUC = '{0}'""".format(RUCEmpresa))
+                                    idFactura = self.parent.cursor.fetchone()
+
+                                    self.parent.cursor.execute("""SELECT idProductos_Compra FROM productos_compra 
+                                                                    WHERE Nombre_Producto='{0}'""".format(
+                                        Nombre_Producto[0]))
+                                    idProductos = self.parent.cursor.fetchone()
+
+                                    self.parent.cursor.execute("""SELECT COUNT(*) FROM factura_ordinaria""")
+                                    idFacturaOrdinaria = self.parent.cursor.fetchone()
+
+                                    self.parent.cursor.execute("""INSERT INTO factura_ordinaria 
+                                                                    (idFactura_Ordinaria, Cantidad, Factura_idFactura, Compra_idProductos_Compra, 
+                                                                    Descripcion) 
+                                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')""".
+                                                               format(idFacturaOrdinaria[0] + 1, int(productos[2]),
+                                                                      idFactura[0], idProductos[0], productos[3]))
+
+                                    self.parent.cursor.execute("""SELECT Cantidad FROM productos_compra 
+                                    WHERE Nombre_Producto = '{0}'""".format(productos[1]))
+
+                                    Producto_Disposicion = self.parent.cursor.fetchone()
+
+                                    self.parent.cursor.execute("""UPDATE productos_compra SET Cantidad = '{0}' 
+                                                                    WHERE idProductos_Compra='{1}'""".
+                                                               format(Producto_Disposicion[0] - int(productos[2]),
+                                                                      idProductos[0]))
 
                                     connection().commit()
 
+                                    Confirm = True
+
                                 elif Respuesta == wx.ID_NO:
+                                    again = True
                                     pass
 
                         else:
@@ -550,8 +586,6 @@ class ComercialBillings(object):
                                                                format(Conteo_FacturaOrdinaria + 1, producto[2],
                                                                       idFactura[0],
                                                                       lastid[0], producto[3]))
-
-
                                 except:
                                     pass
                             else:
@@ -600,6 +634,8 @@ class ComercialBillings(object):
                                 VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')""".
                                                            format(Conteo_FacturaOrdinaria[0] + 1, producto[2],
                                                                   idFactura[0], lastid[0], producto[3]))
+
+                                connection().commit()
 
                             Confirm = True
 

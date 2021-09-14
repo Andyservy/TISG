@@ -323,7 +323,6 @@ class Recapitulativa(object):
         if None in Total:
             pass
 
-
         self.Resultados[0].SetValue(str(sum(float(x) for x in Total)))
 
     def OnClickGuardar(self, event):
@@ -413,8 +412,9 @@ class Recapitulativa(object):
                     idFacturaOrdinaria = self.parent.cursor.fetchone()
 
                     self.parent.cursor.execute("""INSERT INTO recapitulativa 
-                    (idRecapitulativa, Factura_Factura, RUC) 
-                    VALUES ('{0}', '{1}', '{2}')""".format(idFacturaOrdinaria[0] + 1, idFactura[0], Recapitulativas[1]))
+                    (idRecapitulativa, Factura_Factura, RUC, Descripcion) 
+                    VALUES ('{0}', '{1}', '{2}', '{3}')""".format(idFacturaOrdinaria[0] + 1, idFactura[0],
+                                                                  Recapitulativas[1], Recapitulativas[3]))
 
                     connection().commit()
 

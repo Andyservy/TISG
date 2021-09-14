@@ -2,6 +2,7 @@ import wx
 
 from Proyecto_TISG.Package import Btnbicolor, show_messange
 from Proyecto_TISG import connection
+from Proyecto_TISG.Variables import *
 
 import wx.adv
 
@@ -52,7 +53,7 @@ class PanelConfi(wx.Panel):
         Entrada_Usuario = wx.TextCtrl(box_Usuario.GetStaticBox(), -1, style=wx.BORDER_NONE)
         box_Usuario.Add(Entrada_Usuario, 1, wx.EXPAND | wx.ALL, 5)
 
-        pic_username = wx.Bitmap('C:/Users/USUARIO/Desktop/TISG/bin/GUARDAR_ICON.png', wx.BITMAP_TYPE_PNG)
+        pic_username = wx.Bitmap(Guardar[0], wx.BITMAP_TYPE_PNG)
         Guardar_username = wx.BitmapButton(box_Usuario.GetStaticBox(), -1, pic_username, size=(50, 50))
         box_Usuario.Add(Guardar_username)
 
@@ -67,7 +68,7 @@ class PanelConfi(wx.Panel):
         box_Contraseña_1.Add(Entrada_Contraseña, 1, wx.EXPAND | wx.ALL, 5)
         self.tip = wx.adv.RichToolTip('LIMIT', 'La contraseña debe tener mas de 6 dígitos')
 
-        pic_contraseña = wx.Bitmap('C:/Users/USUARIO/Desktop/TISG/bin/GUARDAR_ICON.png', wx.BITMAP_TYPE_PNG)
+        pic_contraseña = wx.Bitmap(Guardar[0], wx.BITMAP_TYPE_PNG)
         Guardar_contraseña = wx.BitmapButton(box_Contraseña.GetStaticBox(), -1, pic_contraseña, size=(50, 50))
         box_Contraseña_1.Add(Guardar_contraseña)
 

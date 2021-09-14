@@ -154,8 +154,8 @@ class Panel(wx.Panel, Verificacion):
 
     def OnClickOK(self, event):
 
-        Nombre_Entrada = "usuario"  # self.Entrada_Name.GetValue()
-        Contraseña_Entrada = "123456"  # self.ENTRADA_Contraseña.GetValue()
+        Nombre_Entrada = self.Entrada_Name.GetValue()
+        Contraseña_Entrada = self.ENTRADA_Contraseña.GetValue()
         """Como se puede evidenciar, estoy usando los atributos de Entrada_Name pertenecientes al panel; sin embargo 
         esto no sería posible si haber instanciado como atributo el Entrada_Name """
 

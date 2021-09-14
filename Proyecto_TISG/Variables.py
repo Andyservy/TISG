@@ -24,6 +24,8 @@ Agregar = [os.path.abspath('Agregar.png'), os.path.abspath('Agregar_Out.png')]
 
 Quitar = [os.path.abspath('Quitar.png'), os.path.abspath('Quitar_Out.png')]
 
+Guardar = [os.path.abspath('GUARDAR_ICON.png')]
+
 list_DatosEmpresa = ['RazonSocial', 'DireccionMatriz', 'RUC', 'Resumen', 'IGV', 'TipoEmpresa', 'Telefono']
 
 TiposEmpresa = ['SA', 'SAC', 'SRL', 'EIRL', 'SAA', '']

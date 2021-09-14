@@ -7,8 +7,10 @@ def main():
     app = wx.App()
 
     FrameMain(None, title='Boost Manager')
+    try:
+        app.MainLoop()
 
-    app.MainLoop()
-
+    except:
+        pass
 
 """Punto de entrada"""

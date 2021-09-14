@@ -6,11 +6,16 @@ from Proyecto_TISG.Frame_main.Configuración import RestablecimientoDeDatos
 from Proyecto_TISG.Package.Formulary import Verificacion
 from Proyecto_TISG import connection
 
+import wx
+import os
+from wx.lib.embeddedimage import PyEmbeddedImage
 
 class FrameMain(wx.Frame):
     def __init__(self, parent, title):
         super(FrameMain, self).__init__(parent, title=title, size=(1000, 730))
         self.Attribute()
+
+        self.SetIcon(wx.Icon("../bin/logo.png"))
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
